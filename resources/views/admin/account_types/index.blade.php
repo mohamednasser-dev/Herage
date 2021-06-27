@@ -1,6 +1,6 @@
 @extends('admin.app')
 
-@section('title' , __('messages.mndobeen'))
+@section('title' , __('messages.ecomercial_account_types'))
 
 @section('content')
     <div id="tableSimple" class="col-lg-12 col-12 layout-spacing">
@@ -8,7 +8,10 @@
             <div class="widget-header">
                 <div class="row">
                     <div class="col-xl-12 col-md-12 col-sm-12 col-12">
-                        <h4>{{ __('messages.mndobeen') }}</h4>
+                        <h4>{{ __('messages.ecomercial_account_types') }}</h4>
+                    </div>
+                    <div class="col-xl-12 col-md-12 col-sm-12 col-12">
+                        <a class="btn btn-primary" href="{{route('account_types.create')}}">{{ __('messages.add') }}</a>
                     </div>
                 </div>
             </div>
@@ -19,10 +22,7 @@
                     <thead>
                         <tr>
                             <th class="text-center blue-color">Id</th>
-                            <th class="text-center blue-color">{{ __('messages.image') }}</th>
                             <th class="text-center blue-color">{{ __('messages.name') }}</th>
-                            <th class="text-center blue-color">{{ __('messages.phone') }}</th>
-                            <th class="text-center blue-color">{{ __('messages.watsapp') }}</th>
                             <th class="text-center blue-color">{{ __('messages.date') }}</th>
                             @if(Auth::user()->update_data)
                                 <th class="text-center">{{ __('messages.edit') }}</th>
@@ -37,16 +37,13 @@
                         @foreach ($data as $row)
                             <tr >
                                 <td class="text-center blue-color"><?=$i;?></td>
-                                <td class="text-center"><img src="{{image_cloudinary_url()}}{{ $row->image }}"  /></td>
                                 <td class="text-center blue-color">{{ app()->getLocale() == 'en' ? $row->name_en : $row->name_ar }}</td>
-                                <td class="text-center">{{ $row->phone }}</td>
-                                <td class="text-center">{{ $row->watsapp }}</td>
                                 <td class="text-center">{{ $row->created_at->format('Y-m-d') }}</td>
                                 @if(Auth::user()->update_data)
-                                    <td class="text-center blue-color" ><a href="{{ route('mndob.edit', $row->id) }}" ><i class="far fa-edit"></i></a></td>
+                                    <td class="text-center blue-color" ><a href="{{ route('account_types.edit', $row->id) }}" ><i class="far fa-edit"></i></a></td>
                                 @endif
                                 @if(Auth::user()->delete_data)
-                                    <td class="text-center blue-color" ><a onclick="return confirm('{{ __('messages.are_you_sure') }}');" href="{{ route('mndob.delete', $row->id) }}" ><i class="far fa-trash-alt"></i></a></td>
+                                    <td class="text-center blue-color" ><a onclick="return confirm('{{ __('messages.are_you_sure') }}');" href="{{ route('account_types.delete', $row->id) }}" ><i class="far fa-trash-alt"></i></a></td>
                                 @endif
                                 <?php $i++; ?>
                             </tr>

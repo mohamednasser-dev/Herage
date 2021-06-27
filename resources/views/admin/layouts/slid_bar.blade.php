@@ -50,11 +50,11 @@
                         </ul>
                     </li>
                 @endif
-                    @php
-                        $reports_count =  \App\Product_report::where('status','new')->get()->count();
-                        $comments_count =  \App\Product_comment::where('status','new')->get()->count();
-                        $total_count = $reports_count + $comments_count ;
-                    @endphp
+                @php
+                    $reports_count =  \App\Product_report::where('status','new')->get()->count();
+                    $comments_count =  \App\Product_comment::where('status','new')->get()->count();
+                    $total_count = $reports_count + $comments_count ;
+                @endphp
 
                 @if(in_array(13 , Auth::user()->custom['admin_permission']))
                     <li class="menu products">
@@ -173,7 +173,8 @@
                                 <a href="/admin-panel/ads/show">{{ __('messages.main_ads_second') }}</a>
                             </li>
                             <li class="">
-                                <a href="{{route('main_ads.index')}}" @if(Route::current()->getName() == 'main_ads.index') style="color: #1b55e2; font-weight: 600;"  @endif >{{ __('messages.main_ads') }}</a>
+                                <a href="{{route('main_ads.index')}}"
+                                   @if(Route::current()->getName() == 'main_ads.index') style="color: #1b55e2; font-weight: 600;" @endif >{{ __('messages.main_ads') }}</a>
                             </li>
                         </ul>
                     </li>
@@ -199,6 +200,16 @@
                                       </span>
                                     @endif
                                  </span>
+                            </div>
+                        </a>
+                    </li>
+                @endif
+                @if(in_array(18 , Auth::user()->custom['admin_permission']))
+                    <li class="menu account_types">
+                        <a href="/admin-panel/account_types" class="dropdown-toggle first-link">
+                            <div class="">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                                <span>{{ __('messages.ecomercial_account_types') }}</span>
                             </div>
                         </a>
                     </li>
@@ -294,21 +305,21 @@
                     </li>
                 @endif
 
-{{--                @if(in_array(8 , Auth::user()->custom['admin_permission']))--}}
-{{--                    <li class="menu meta_tags">--}}
-{{--                        <a href="/admin-panel/meta_tags" class="dropdown-toggle first-link">--}}
-{{--                            <div class="">--}}
-{{--                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"--}}
-{{--                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"--}}
-{{--                                     stroke-linejoin="round" class="feather feather-search">--}}
-{{--                                    <circle cx="11" cy="11" r="8"></circle>--}}
-{{--                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>--}}
-{{--                                </svg>--}}
-{{--                                <span>{{ __('messages.meta_tags') }}</span>--}}
-{{--                            </div>--}}
-{{--                        </a>--}}
-{{--                    </li>--}}
-{{--                @endif--}}
+                {{--                @if(in_array(8 , Auth::user()->custom['admin_permission']))--}}
+                {{--                    <li class="menu meta_tags">--}}
+                {{--                        <a href="/admin-panel/meta_tags" class="dropdown-toggle first-link">--}}
+                {{--                            <div class="">--}}
+                {{--                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"--}}
+                {{--                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"--}}
+                {{--                                     stroke-linejoin="round" class="feather feather-search">--}}
+                {{--                                    <circle cx="11" cy="11" r="8"></circle>--}}
+                {{--                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>--}}
+                {{--                                </svg>--}}
+                {{--                                <span>{{ __('messages.meta_tags') }}</span>--}}
+                {{--                            </div>--}}
+                {{--                        </a>--}}
+                {{--                    </li>--}}
+                {{--                @endif--}}
 
                 @if(in_array(9 , Auth::user()->custom['admin_permission']))
                     <li class="menu managers">

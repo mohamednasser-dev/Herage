@@ -4,7 +4,7 @@
 
 
 
-
+        'ecomercial_account_types' => "Business account types",
         'our_offers' => "our offers",
         'choose_to_you' => "choose to you",
         'show_all' => "choose to you",

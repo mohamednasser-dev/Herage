@@ -4,6 +4,7 @@ return [
 
 
 
+
     'reports' => "البلاغات",
     'reporter_name' => "اسم مقدم البلاغ",
     'ad_name' => "اسم الاعلان",
@@ -19,7 +20,7 @@ return [
     'rejected_done' => "تم الرفض  بنجاح",
 
 
-
+    'ecomercial_account_types' => "أنواع الحساب التجاري",
     'our_offers' => "عروضنا",
     'choose_to_you' => "اخترنالك",
     'show_all' => "اخترنالك",

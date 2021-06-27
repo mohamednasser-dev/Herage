@@ -32,7 +32,7 @@ use Illuminate\Http\Request;
         'middleware' => 'api',
         'prefix' => 'user'
     ], function($router) {
-        Route::get('profile/{lang}/{v}' , 'UserController@getprofile');
+        Route::get('select_my_data/{lang}/{v}' , 'UserController@select_my_data');
         Route::post('profile/{lang}/{v}' , 'UserController@updateprofile');
         Route::put('resetpassword/{lang}/{v}' , 'UserController@resetpassword');
         Route::put('resetforgettenpassword/{lang}/{v}' , 'UserController@resetforgettenpassword')->middleware('checkguest');
@@ -76,6 +76,7 @@ use Illuminate\Http\Request;
         Route::post('create/{lang}/{v}' , 'ProductController@create');
         Route::post('uploadimages/{lang}/{v}' , 'ProductController@uploadimages');
         Route::get('details/{id}/{lang}/{v}' , 'ProductController@getdetails')->middleware('checkguest');
+        Route::get('all_comments/{id}/{lang}/{v}' , 'ProductController@all_comments')->middleware('checkguest');
         Route::post('details/make_report/{lang}/{v}' , 'ProductController@make_report')->middleware('checkguest');
         Route::post('details/make_comment/{lang}/{v}' , 'ProductController@make_comment')->middleware('checkguest');
     });
@@ -111,6 +112,7 @@ use Illuminate\Http\Request;
 
     // get home data
     Route::get('/home-ads/{lang}/{v}' , 'HomeController@getHomeAds')->middleware('checkguest');
+    Route::get('/home/city_filter/{area_id}/{lang}/{v}' , 'HomeController@city_filter')->middleware('checkguest');
 
     // send contact us message
     Route::post('/contactus/{lang}/{v}' , 'ContactUsController@SendMessage')->middleware('checkguest');
@@ -171,7 +173,7 @@ use Illuminate\Http\Request;
     Route::get('/ad/save_third_step/excute_pay' , 'ProductController@third_step_excute_pay');
 
 
-    Route::get('/ad/select_my_ads/{lang}/{v}' , 'ProductController@select_ended_ads');
+    Route::get('/ad/select_my_ads/{lang}/{v}' , 'ProductController@select_my_ads');
     Route::get('/ad/ended_ads/{lang}/{v}' , 'ProductController@ended_ads');
     Route::get('/ad/current_ads/{lang}/{v}' , 'ProductController@current_ads');
     Route::get('/ad/select_current_ads/{lang}/{v}' , 'ProductController@select_current_ads');

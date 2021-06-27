@@ -34,7 +34,7 @@
                                 <div class="card-body">
                                     <div class="form-group mb-4">
                                         <img
-                                            src="https://res.cloudinary.com/carsads2021/image/upload/w_100,q_100/v1581928924/{{$data['setting']['logo']}}">
+                                            src="{{image_cloudinary_url()}}{{$data['setting']['logo']}}">
                                     </div>
                                     <div class="form-group mb-4">
                                         <label for="logo">{{ __('messages.logo') }}</label>

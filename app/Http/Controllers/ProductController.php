@@ -37,7 +37,7 @@ class ProductController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['make_comment','make_report','ad_owner_info', 'current_ads', 'ended_ads', 'max_min_price', 'filter', 'offer_ads', 'republish_ad',
+        $this->middleware('auth:api', ['except' => ['select_my_ads','all_comments','make_comment','make_report','ad_owner_info', 'current_ads', 'ended_ads', 'max_min_price', 'filter', 'offer_ads', 'republish_ad',
             'areas', 'cities', 'third_step_excute_pay', 'save_third_step_with_money', 'update_ad', 'select_ad_data', 'delete_my_ad',
             'save_third_step', 'save_second_step', 'save_first_step', 'getdetails', 'last_seen', 'getoffers', 'getproducts', 'getsearch', 'getFeatureOffers']]);
         //        --------------------------------------------- begin scheduled functions --------------------------------------------------------
@@ -160,6 +160,17 @@ class ProductController extends Controller
         return response()->json($response, 200);
     }
 
+    public function all_comments(Request $request,$id)
+    {
+        $comments = Product_comment::with('User')
+                                    ->select('id','user_id','comment')
+                                    ->where('product_id',$id)
+                                    ->where('status','accepted')
+                                    ->orderBy('created_at','desc')
+                                    ->get();
+        $response = APIHelpers::createApiResponse(false, 200, '', '', $comments, $request->lang);
+        return response()->json($response, 200);
+    }
     public function getdetails(Request $request)
     {
         $user = auth()->user();
@@ -175,7 +186,11 @@ class ProductController extends Controller
                 $data->price = 'Ask the seller';
             }
         }
-        $data->comments_count = Product_comment::where('status','accepted')->where
+        $data->comments_count = Product_comment::where('status','accepted')
+                                                ->where('product_id',$request->id)
+                                                ->orderBy('created_at','desc')
+                                                ->get()
+                                                ->count();
 
         if ($data->share_location == '0') {
             $data->share_location = 0;
@@ -985,7 +1000,7 @@ class ProductController extends Controller
         }
     }
 
-    public function select_ended_ads(Request $request)
+    public function select_my_ads(Request $request)
     {
         $ads['ended_ads'] = Product::where('status', 2)
             ->where('deleted', 0)

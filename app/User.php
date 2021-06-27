@@ -25,6 +25,11 @@ class User extends Authenticatable implements JWTSubject
         'free_balance',
         'payed_balance',
         'watsapp',
+        'cover',
+        'about_user',
+        'city_id',
+        'area_id',
+        'account_type',
         'image'
       ];
     use Notifiable;
@@ -53,5 +58,16 @@ class User extends Authenticatable implements JWTSubject
 
     public function products() {
         return $this->hasMany('App\Product', 'user_id');
+    }
+
+    public function City() {
+        return $this->belongsTo('App\City', 'city_id');
+    }
+    public function Area() {
+        return $this->belongsTo('App\Area', 'area_id');
+    }
+
+    public function Account_type() {
+        return $this->belongsTo('App\Account_type', 'account_type')->select('id','name_'.session('api_lang').' as name','type');
     }
 }

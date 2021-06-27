@@ -26,7 +26,7 @@ class HomeController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['balance_packages', 'gethome', 'getHomeAds', 'check_ad', 'main_ad']]);
+        $this->middleware('auth:api', ['except' => ['city_filter','balance_packages', 'gethome', 'getHomeAds', 'check_ad', 'main_ad']]);
     }
 
     public function gethome(Request $request)
@@ -122,10 +122,10 @@ class HomeController extends Controller
 
         $data['categories'] = $categories;
 
-        $products = Product::where('status', 1)->with('Publisher')
+        $products = Product::where('status', 1)
+            ->with('Publisher')
             ->where('publish', 'Y')
             ->where('deleted', 0)
-            ->where('status', 1)
             ->whereIn('category_id', $cat_ids)
             ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
             ->orderBy('created_at', 'desc')
@@ -179,6 +179,48 @@ class HomeController extends Controller
             $image['image'] = $image->image;
         }
         $response = APIHelpers::createApiResponse(false, 200, '', '', $image, $request->lang);
+        return response()->json($response, 200);
+    }
+    public function city_filter(Request $request,$area_id)
+    {
+        $user = auth()->user();
+        $lang = $request->lang;
+        $products = Product::where('status', 1)
+                            ->with('Publisher')
+                            ->where('publish', 'Y')
+                            ->where('deleted', 0)
+                            ->where('area_id', $area_id)
+                            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+                            ->orderBy('created_at', 'desc')
+                            ->simplePaginate(12);
+        for ($i = 0; $i < count($products); $i++) {
+            if($lang == 'ar'){
+                $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
+            }else{
+                $products[$i]['address'] = $products[$i]['City']->title_en .' , '.$products[$i]['Area']->title_en;
+            }
+
+            if ($user) {
+                $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
+                if ($favorite) {
+                    $products[$i]['favorite'] = true;
+                } else {
+                    $products[$i]['favorite'] = false;
+                }
+
+                $conversation = Participant::where('ad_product_id', $products[$i]['id'])->where('user_id', $user->id)->first();
+                if ($conversation == null) {
+                    $products[$i]['conversation_id'] = 0;
+                } else {
+                    $products[$i]['conversation_id'] = $conversation->conversation_id;
+                }
+            } else {
+                $products[$i]['favorite'] = false;
+                $products[$i]['conversation_id'] = 0;
+            }
+            $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
+        }
+        $response = APIHelpers::createApiResponse(false, 200, '', '', $products, $request->lang);
         return response()->json($response, 200);
     }
 

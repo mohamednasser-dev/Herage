@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Participant;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use JD\Cloudder\Facades\Cloudder;
@@ -25,14 +27,15 @@ class UserController extends Controller
         $this->middleware('auth:api' , ['except' => ['pay_sucess','pay_error','excute_pay','my_account','my_balance','resetforgettenpassword' , 'checkphoneexistance','checkphoneexistanceandroid' , 'getownerprofile']]);
     }
 
-    public function getprofile(Request $request){
+    public function select_my_data(Request $request){
         $user = auth()->user();
-        $returned_user['user_name'] = $user['name'];
-		$returned_user['name'] = $user['name'];
-        $returned_user['phone'] = $user['phone'];
-        $returned_user['email'] = $user['email'];
-        $returned_user['image'] = $user['image'];
-        $response = APIHelpers::createApiResponse(false , 200 ,  '', '' , $returned_user, $request->lang );
+        $lang = $request->lang ;
+        Session::put('api_lang', $lang);
+        $data = User::with('City')->with('Area')->with('Account_type')
+            ->where('id',$user->id)
+            ->select('name','email','about_user','image','cover','phone','watsapp','city_id','area_id','account_type','created_at')
+            ->first();
+        $response = APIHelpers::createApiResponse(false , 200 ,  '', '' ,$data , $lang);
         return response()->json($response , 200);
     }
     public function checkphoneexistanceandroid(Request $request)
@@ -506,14 +509,92 @@ class UserController extends Controller
     }
 //nasser code
     public function my_account(Request $request){
+        $lang = $request->lang ;
         $user = auth()->user();
-        $user_data = User::where('id',$user->id)->select('name','email','image','phone','free_balance','payed_balance','created_at')->first();
-//        if($user_data->image == null){
-//            $settings = Setting::where('id',1)->first();
-//
-//            $user_data['image'] = $settings->logo;
-//        }
-        $response = APIHelpers::createApiResponse(false , 200 , '' , '' , $user_data , $request->lang);
+        $data['personal_data'] = User::with('City')->with('Area')
+            ->where('id',$user->id)
+            ->select('name','email','about_user','image','cover','phone','watsapp','city_id','area_id','account_type','created_at')
+            ->first();
+       if($data['personal_data']->city_id != null && $data['personal_data']->area_id != null){
+           $data['personal_data']->address = $data['personal_data']->City->title_ar . ' , '.$data['personal_data']->Area->title_ar ;
+       }else{
+           $data['personal_data']->address = "";
+       }
+
+
+
+        $products = Product::with('City')->with('Area')->where('status', 2)
+                            ->where('deleted', 0)
+                            ->where('user_id', auth()->user()->id)
+                            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+                            ->orderBy('created_at', 'desc')
+                            ->simplePaginate(12);
+                        for ($i = 0; $i < count($products); $i++) {
+                            if($lang == 'ar'){
+                                $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
+                            }else{
+                                $products[$i]['address'] = $products[$i]['City']->title_en .' , '.$products[$i]['Area']->title_en;
+                            }
+
+                            if ($user) {
+                                $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
+                                if ($favorite) {
+                                    $products[$i]['favorite'] = true;
+                                } else {
+                                    $products[$i]['favorite'] = false;
+                                }
+
+                                $conversation = Participant::where('ad_product_id', $products[$i]['id'])->where('user_id', $user->id)->first();
+                                if ($conversation == null) {
+                                    $products[$i]['conversation_id'] = 0;
+                                } else {
+                                    $products[$i]['conversation_id'] = $conversation->conversation_id;
+                                }
+                            } else {
+                                $products[$i]['favorite'] = false;
+                                $products[$i]['conversation_id'] = 0;
+                            }
+                            $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
+                        }
+        $current_products = Product::with('City')->with('Area')->where('status', 1)
+                            ->where('publish', 'Y')
+                            ->where('deleted', 0)
+                            ->where('user_id', auth()->user()->id)
+                            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+                            ->orderBy('created_at', 'desc')
+                            ->simplePaginate(12);
+        for ($i = 0; $i < count($current_products); $i++) {
+            if($lang == 'ar'){
+                $current_products[$i]['address'] = $current_products[$i]['City']->title_ar .' , '.$current_products[$i]['Area']->title_ar;
+            }else{
+                $current_products[$i]['address'] = $current_products[$i]['City']->title_en .' , '.$current_products[$i]['Area']->title_en;
+            }
+
+            if ($user) {
+                $favorite = Favorite::where('user_id', $user->id)->where('product_id', $current_products[$i]['id'])->first();
+                if ($favorite) {
+                    $current_products[$i]['favorite'] = true;
+                } else {
+                    $current_products[$i]['favorite'] = false;
+                }
+
+                $conversation = Participant::where('ad_product_id', $current_products[$i]['id'])->where('user_id', $user->id)->first();
+                if ($conversation == null) {
+                    $current_products[$i]['conversation_id'] = 0;
+                } else {
+                    $current_products[$i]['conversation_id'] = $conversation->conversation_id;
+                }
+            } else {
+                $current_products[$i]['favorite'] = false;
+                $current_products[$i]['conversation_id'] = 0;
+            }
+            $current_products[$i]['time'] = APIHelpers::get_month_day($current_products[$i]['created_at'], $lang);
+        }
+        $data['ended_ads'] = $products ;
+        $data['current_ads'] = $current_products ;
+        $data['personal_data']->current_ads_count = $data['current_ads']->count();
+        $data['personal_data']->end_ads_count = $data['ended_ads']->count();
+        $response = APIHelpers::createApiResponse(false , 200 , '' , '' , $data , $request->lang);
         return response()->json($response , 200);
     }
     public function payments_date(Request $request){

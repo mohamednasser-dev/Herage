@@ -20,7 +20,7 @@ class Product extends Model
     }
 
     public function Publisher() {
-        return $this->belongsTo('App\User', 'user_id')->select('id','name','account_type');
+        return $this->belongsTo('App\User', 'user_id')->select('id','name','account_type')->with('Account_type');
     }
 
     public function Product_user() {

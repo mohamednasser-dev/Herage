@@ -204,6 +204,11 @@ Route::group(['middleware'=>'language','prefix' => "admin-panel",'namespace' => 
         Route::get('delete/{id}' , 'ContactUsController@delete');
     });
 
+    // Business account types Route
+    Route::resource('account_types', 'AccountTypesController');
+    Route::post('account_types/update/{id}', 'AccountTypesController@update')->name('account_types.update.new');
+    Route::get('account_types/delete/{id}' , 'AccountTypesController@destroy')->name("account_types.delete");
+
     // Notifications Route
     Route::group(["prefix" => "notifications"], function($router){
         Route::get('show' , 'NotificationController@show');

@@ -77,7 +77,7 @@
             @csrf
             <div class="form-group mb-4">
                 <label for="">{{ __('messages.current_image') }}</label><br>
-                <img src="https://res.cloudinary.com/carsads2021/image/upload/w_100,q_100/v1581928924/{{ $data['ad']['image'] }}"  />
+                <img src="{{image_cloudinary_url()}}{{ $data['ad']['image'] }}"  />
             </div>
             <div class="custom-file-container" data-upload-id="myFirstImage">
                 <label>{{ __('messages.change_image') }} ({{ __('messages.single_image') }}) <a href="javascript:void(0)" class="custom-file-container__image-clear" title="Clear Image">x</a></label>
