@@ -14,6 +14,7 @@ use App\SubFiveCategory;
 use App\SubFourCategory;
 use App\SubThreeCategory;
 use App\SubTwoCategory;
+use App\User_specialty;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Session;
 use JD\Cloudder\Facades\Cloudder;
@@ -37,33 +38,18 @@ class ProductController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['select_my_ads','all_comments','make_comment','make_report','ad_owner_info', 'current_ads', 'ended_ads', 'max_min_price', 'filter', 'offer_ads', 'republish_ad',
+        $this->middleware('auth:api', ['except' => ['select_my_ads', 'all_comments', 'make_comment', 'make_report', 'ad_owner_info', 'current_ads', 'ended_ads', 'max_min_price', 'filter', 'offer_ads', 'republish_ad',
             'areas', 'cities', 'third_step_excute_pay', 'save_third_step_with_money', 'update_ad', 'select_ad_data', 'delete_my_ad',
             'save_third_step', 'save_second_step', 'save_first_step', 'getdetails', 'last_seen', 'getoffers', 'getproducts', 'getsearch', 'getFeatureOffers']]);
         //        --------------------------------------------- begin scheduled functions --------------------------------------------------------
-
-        $mytime = Carbon::now();
-        $today = Carbon::parse($mytime->toDateTimeString())->format('Y-m-d H:i');
-
-        $pin_ad = Setting::where('id', 1)->whereDate('free_loop_date', '<', Carbon::now())->first();
-        if ($pin_ad != null) {
-            if ($pin_ad->is_loop_free_balance == 'y') {
-                $all_users = User::where('active', 1)->get();
-                foreach ($all_users as $row) {
-                    $user = User::find($row->id);
-                    $user->my_wallet = $user->my_wallet + $pin_ad->free_loop_balance;
-                    $user->free_balance = $user->free_balance + $pin_ad->free_loop_balance;
-                    $user->save();
-                }
-                $final_pin_date = Carbon::createFromFormat('Y-m-d H:i', $today);
-                $final_free_loop_date = $final_pin_date->addDays($pin_ad->free_loop_period);
-                $pin_ad->free_loop_date = $final_free_loop_date;
-                $pin_ad->save();
-            }
+        $expired = Product::where('status', 1)->whereDate('expiry_date', '<', Carbon::now())->get();
+        foreach ($expired as $row) {
+            $product = Product::find($row->id);
+            $product->status = 2;
+            $product->re_post = '0';
+            $product->save();
         }
-//        --------------------------------------------- end scheduled functions --------------------------------------------------------
-
-
+        //        --------------------------------------------- end scheduled functions --------------------------------------------------------
     }
 
     public function create(Request $request)
@@ -160,37 +146,34 @@ class ProductController extends Controller
         return response()->json($response, 200);
     }
 
-    public function all_comments(Request $request,$id)
+    public function all_comments(Request $request, $id)
     {
         $comments = Product_comment::with('User')
-                                    ->select('id','user_id','comment')
-                                    ->where('product_id',$id)
-                                    ->where('status','accepted')
-                                    ->orderBy('created_at','desc')
-                                    ->get();
+            ->select('id', 'user_id', 'comment')
+            ->where('product_id', $id)
+            ->where('status', 'accepted')
+            ->orderBy('created_at', 'desc')
+            ->get();
         $response = APIHelpers::createApiResponse(false, 200, '', '', $comments, $request->lang);
         return response()->json($response, 200);
     }
+
     public function getdetails(Request $request)
     {
+
         $user = auth()->user();
         $lang = $request->lang;
+        Session::put('api_lang', $lang);
         Session::put('lang', $lang);
         $data = Product::with('Product_user')->with('Area_name')
             ->select('id', 'title', 'main_image', 'description', 'price', 'type', 'publication_date as date', 'user_id', 'category_id', 'latitude', 'longitude', 'share_location', 'area_id')
             ->find($request->id);
-        if ($data->price == 0) {
-            if ($lang == 'ar') {
-                $data->price = 'اسأل البائع';
-            } else {
-                $data->price = 'Ask the seller';
-            }
-        }
-        $data->comments_count = Product_comment::where('status','accepted')
-                                                ->where('product_id',$request->id)
-                                                ->orderBy('created_at','desc')
-                                                ->get()
-                                                ->count();
+        $data->price = number_format((float)($data->price), 3);
+        $data->comments_count = Product_comment::where('status', 'accepted')
+            ->where('product_id', $request->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->count();
 
         if ($data->share_location == '0') {
             $data->share_location = 0;
@@ -254,42 +237,43 @@ class ProductController extends Controller
         $data->time = date_format($date, 'g:i a');
 
 
-
         //to get ad images in array
         $images = ProductImage::where('product_id', $data->id)->pluck('image')->toArray();
         $images[count($images)] = $data->main_image;
         $data->images = $images;
 
-        $comments = Product_comment::with('User')->select('id','user_id','comment')->where('product_id',$data->id)->where('status','accepted')->orderBy('created_at','desc')->limit(3)->get();
+        $comments = Product_comment::with('User')->select('id', 'user_id', 'comment')->where('product_id', $data->id)->where('status', 'accepted')->orderBy('created_at', 'desc')->limit(3)->get();
+
+
         $related = Product::where('category_id', $data->category_id)
             ->where('id', '!=', $data->id)
             ->where('status', 1)
             ->where('publish', 'Y')
             ->where('deleted', 0)
             ->with('Publisher')
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id')
             ->limit(3)
-            ->get()
-            ->map(function ($ads) use ($lang,$user) {
-                if($lang == 'ar'){
-                    $ads->address = $ads->City->title_ar .' , '.$ads->Area->title_ar;
-                }else{
-                    $ads->address = $ads->City->title_en .' , '.$ads->Area->title_en;
+            ->get()->makeHidden(['City', 'Area'])
+            ->map(function ($ads) use ($lang, $user) {
+                if ($lang == 'ar') {
+                    $ads->address = $ads->City->title_ar . ' , ' . $ads->Area->title_ar;
+                } else {
+                    $ads->address = $ads->City->title_en . ' , ' . $ads->Area->title_en;
                 }
-                if($user){
-                    $favorite = Favorite::where('user_id', $user->id)->where( 'product_id', $ads->id )->first();
+                if ($user) {
+                    $favorite = Favorite::where('user_id', $user->id)->where('product_id', $ads->id)->first();
                     if ($favorite) {
                         $ads->favorite = true;
                     } else {
                         $ads->favorite = false;
                     }
-                    $conversation = Participant::where('ad_product_id',$ads->id)->where('user_id', $user->id)->first();
+                    $conversation = Participant::where('ad_product_id', $ads->id)->where('user_id', $user->id)->first();
                     if ($conversation == null) {
                         $ads->conversation_id = 0;
                     } else {
                         $ads->conversation_id = $conversation->conversation_id;
                     }
-                }else{
+                } else {
                     $ads->favorite = false;
                     $ads->conversation_id = 0;
                 }
@@ -298,7 +282,7 @@ class ProductController extends Controller
             });
 
         $response = APIHelpers::createApiResponse(false, 200, '', '', array('product' => $data,
-            'features' => $feature_data, 'comments'=>$comments,'related' => $related), $request->lang);
+            'features' => $feature_data, 'comments' => $comments, 'related' => $related), $request->lang);
         return response()->json($response, 200);
     }
 
@@ -369,36 +353,78 @@ class ProductController extends Controller
     {
         $user = auth()->user();
         $lang = $request->lang;
-        $data['basic_info'] = User::select('id', 'name', 'email', 'image', 'phone')->where('id', $id)->first();
-        $data['ads'] = Product::select('id', 'title', 'price', 'main_image')
+        Session::put('api_lang', $lang);
+        $basic_info = User::with('Account_type')->select('id', 'name', 'cover', 'email', 'image','account_type', 'phone', 'city_id', 'area_id', 'about_user', 'created_at as join_date')->where('id', $id)->first()->makeHidden(['city_id', 'area_id', 'City', 'Area']);
+
+        if ($basic_info->city_id != null && $basic_info->area_id != null) {
+            $basic_info->address = $basic_info->City->title_ar . ' , ' . $basic_info->Area->title_ar;
+        } else {
+            $basic_info->address = "";
+        }
+        $spec = "";
+        if($basic_info->Account_type->type == 'commercial'){
+            $user_specialties = User_specialty::with('Specialty')
+                ->select('special_id')
+                ->where('user_id', $id)->get();
+
+            foreach ($user_specialties as $row) {
+                if ($lang == 'ar') {
+                    $spec = $spec . ',' . $row->Specialty->name;
+                } else {
+                    $spec = $spec . ',' . $row->Specialty->name;
+                }
+            }
+            $basic_info->specialties = $spec;
+        }else{
+            $basic_info->specialties = "";
+        }
+        $basic_info->current_ads_count = Product::where('user_id', $id)
+            ->where('status', 1)
+            ->where('publish', 'Y')
+            ->where('deleted', 0)
+            ->get()->count();
+
+        $products = Product::select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
             ->where('user_id', $id)
             ->where('status', 1)
             ->where('publish', 'Y')
-            ->where('deleted', '0')
-            ->get()->map(function ($data) use ($lang, $user) {
-                if ($data->price == 0) {
-                    if ($lang == 'ar') {
-                        $data->price = 'اسأل البائع';
-                    } else {
-                        $data->price = 'Ask the seller';
-                    }
-                }
-                if ($user != null) {
-                    $favorite = Favorite::where('user_id', $user->id)->where('product_id', $data->id)->first();
-                    if ($favorite) {
-                        $data->favorite = true;
-                    } else {
-                        $data->favorite = false;
-                    }
+            ->where('deleted', 0)
+            ->orderBy('created_at', 'desc')
+            ->simplePaginate(12);
+//        ->makeHidden(['city_id','area_id','City','Area'])
+        for ($i = 0; $i < count($products); $i++) {
+           if($products[$i]['City'] != null &&$products[$i]['Area'] != null  ){
+               if ($lang == 'ar') {
+                   $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
+               } else {
+                   $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
+               }
+           }else{
+               $products[$i]['address'] = "";
+           }
+
+
+            if ($user) {
+                $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
+                if ($favorite) {
+                    $products[$i]['favorite'] = true;
                 } else {
-                    $data->favorite = false;
+                    $products[$i]['favorite'] = false;
                 }
 
-                return $data;
-            });
+                $conversation = Participant::where('ad_product_id', $products[$i]['id'])->where('user_id', $user->id)->first();
+                if ($conversation == null) {
+                    $products[$i]['conversation_id'] = 0;
+                } else {
+                    $products[$i]['conversation_id'] = $conversation->conversation_id;
+                }
+            } else {
+                $products[$i]['favorite'] = false;
+                $products[$i]['conversation_id'] = 0;
+            }
+        }
 
-
-        $response = APIHelpers::createApiResponse(false, 200, '', '', $data, $request->lang);
+        $response = APIHelpers::createApiResponse(false, 200, '', '', array('basic_info'=>$basic_info ,'ads'=>$products), $request->lang);
         return response()->json($response, 200);
 
     }
@@ -484,13 +510,7 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
-            if ($products[$i]['price'] == 0) {
-                if ($lang == 'ar') {
-                    $products[$i]['price'] = 'اسأل البائع';
-                } else {
-                    $products[$i]['price'] = 'Ask the seller';
-                }
-            }
+            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
@@ -596,61 +616,68 @@ class ProductController extends Controller
             if ($user != null) {
                 $input['user_id'] = $user->id;
 
-                    //to get the expire_date of ad
-                    $mytime = Carbon::now();
-                    $today = Carbon::parse($mytime->toDateTimeString())->format('Y-m-d H:i');
-                    $input['publish'] = 'Y';
-                    $input['publication_date'] = $today;
-                    //save second step of creation ...
-                    $image = $request->main_image;
-                    Cloudder::upload("data:image/jpeg;base64," . $image, null);
-                    $imagereturned = Cloudder::getResult();
-                    $image_id = $imagereturned['public_id'];
-                    $image_format = $imagereturned['format'];
-                    $image_new_name = $image_id . '.' . $image_format;
-                    $input['main_image'] = $image_new_name;
-                    //create final
-                    if ($input['price'] == null) {
-                        $input['price'] = '0';
-                    }
-                    $ad_data = Product::create($input);
+                //to get the expire_date of ad
+                $mytime = Carbon::now();
+                $today = Carbon::parse($mytime->toDateTimeString())->format('Y-m-d H:i');
+                $input['publish'] = 'Y';
+                $input['publication_date'] = $today;
+                //save second step of creation ...
+                $image = $request->main_image;
+                Cloudder::upload("data:image/jpeg;base64," . $image, null);
+                $imagereturned = Cloudder::getResult();
+                $image_id = $imagereturned['public_id'];
+                $image_format = $imagereturned['format'];
+                $image_new_name = $image_id . '.' . $image_format;
+                $input['main_image'] = $image_new_name;
+                //create final
+                if ($input['price'] == null) {
+                    $input['price'] = '0';
+                }
+                //create expier day
+                $settings = Setting::find(1);
+                $mytime = Carbon::now();
+                $today = Carbon::parse($mytime->toDateTimeString())->format('Y-m-d H:i');
+                $final_pin_date = Carbon::createFromFormat('Y-m-d H:i', $today);
+                $final_expire_pin_date = $final_pin_date->addDays($settings->expier_days);
+                $input['expiry_date'] = $final_expire_pin_date;
+                $ad_data = Product::create($input);
 
-                    //save product feature ...
-                    if ($request->options != null) {
-                        foreach ($request->options as $key => $option) {
-                            if ($option['option_value'] != null) {
-                                if (is_numeric($option['option_value'])) {
-                                    $option_values = Category_option_value::where('id', $option['option_value'])->first();
-                                    if ($option_values != null) {
-                                        $feature_data['type'] = 'option';
-                                    } else {
-                                        $feature_data['type'] = 'manual';
-                                    }
+                //save product feature ...
+                if ($request->options != null) {
+                    foreach ($request->options as $key => $option) {
+                        if ($option['option_value'] != null) {
+                            if (is_numeric($option['option_value'])) {
+                                $option_values = Category_option_value::where('id', $option['option_value'])->first();
+                                if ($option_values != null) {
+                                    $feature_data['type'] = 'option';
                                 } else {
                                     $feature_data['type'] = 'manual';
                                 }
-                                $feature_data['product_id'] = $ad_data->id;
-                                $feature_data['target_id'] = $option['option_value'];
-                                $feature_data['option_id'] = $option['option_id'];
-                                Product_feature::create($feature_data);
+                            } else {
+                                $feature_data['type'] = 'manual';
                             }
+                            $feature_data['product_id'] = $ad_data->id;
+                            $feature_data['target_id'] = $option['option_value'];
+                            $feature_data['option_id'] = $option['option_id'];
+                            Product_feature::create($feature_data);
                         }
                     }
-                    if($request->images != null){
-                        foreach ($request->images as $image) {
-                            Cloudder::upload("data:image/jpeg;base64," . $image, null);
-                            $imagereturned = Cloudder::getResult();
-                            $image_id = $imagereturned['public_id'];
-                            $image_format = $imagereturned['format'];
-                            $image_name = $image_id . '.' . $image_format;
+                }
+                if ($request->images != null) {
+                    foreach ($request->images as $image) {
+                        Cloudder::upload("data:image/jpeg;base64," . $image, null);
+                        $imagereturned = Cloudder::getResult();
+                        $image_id = $imagereturned['public_id'];
+                        $image_format = $imagereturned['format'];
+                        $image_name = $image_id . '.' . $image_format;
 
-                            $data['product_id'] = $ad_data->id;
-                            $data['image'] = $image_name;
-                            ProductImage::create($data);
-                        }
+                        $data['product_id'] = $ad_data->id;
+                        $data['image'] = $image_name;
+                        ProductImage::create($data);
                     }
-                    $response = APIHelpers::createApiResponse(false, 200, 'your ad added successfully', 'تم أنشاء الاعلان بنجاح', null, $request->lang);
-                    return response()->json($response, 200);
+                }
+                $response = APIHelpers::createApiResponse(false, 200, 'your ad added successfully', 'تم أنشاء الاعلان بنجاح', null, $request->lang);
+                return response()->json($response, 200);
             } else {
                 $response = APIHelpers::createApiResponse(true, 406, '', 'يجب تسجيل الدخول اولا', null, $request->lang);
                 return response()->json($response, 406);
@@ -1218,19 +1245,19 @@ class ProductController extends Controller
             ->with('Area_api')
             ->select('id', 'category_id', 'sub_category_id', 'sub_category_two_id', 'sub_category_three_id', 'sub_category_four_id', 'sub_category_five_id', 'title', 'price', 'description', 'main_image', 'city_id', 'area_id', 'share_location', 'latitude', 'longitude')
             ->first();
-        if($data['ad']['sub_category_id'] == null){
+        if ($data['ad']['sub_category_id'] == null) {
             $data['ad']['sub_category_id'] = 0;
         }
-        if($data['ad']['sub_category_two_id'] == null){
+        if ($data['ad']['sub_category_two_id'] == null) {
             $data['ad']['sub_category_two_id'] = 0;
         }
-        if($data['ad']['sub_category_three_id'] == null){
+        if ($data['ad']['sub_category_three_id'] == null) {
             $data['ad']['sub_category_three_id'] = 0;
         }
-        if($data['ad']['sub_category_four_id'] == null){
+        if ($data['ad']['sub_category_four_id'] == null) {
             $data['ad']['sub_category_four_id'] = 0;
         }
-        if($data['ad']['sub_category_five_id'] == null){
+        if ($data['ad']['sub_category_five_id'] == null) {
             $data['ad']['sub_category_five_id'] = 0;
         }
         if ($data['ad']->share_location == '1') {
@@ -1493,57 +1520,59 @@ class ProductController extends Controller
     }
 
 
-    public function make_report(Request $request){
+    public function make_report(Request $request)
+    {
         $user = auth()->user();
-        if($user->active == 0){
-            $response = APIHelpers::createApiResponse(true , 406 ,  'تم حظر حسابك', 'تم حظر حسابك' , null, $request->lang );
-            return response()->json($response , 406);
+        if ($user->active == 0) {
+            $response = APIHelpers::createApiResponse(true, 406, 'تم حظر حسابك', 'تم حظر حسابك', null, $request->lang);
+            return response()->json($response, 406);
         }
-        $validator = Validator::make($request->all() , [
+        $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
         ]);
-        if($validator->fails()) {
-            $response = APIHelpers::createApiResponse(true , 406 ,  $validator->errors()->first(), $validator->errors()->first() , null, $request->lang );
-            return response()->json($response , 406);
+        if ($validator->fails()) {
+            $response = APIHelpers::createApiResponse(true, 406, $validator->errors()->first(), $validator->errors()->first(), null, $request->lang);
+            return response()->json($response, 406);
         }
-        $reported = Product_report::where('product_id' , $request->product_id)->where('user_id' , $user->id)->first();
-        if($reported){
-            $response = APIHelpers::createApiResponse(true , 406 ,  'this ad reported before', 'تم الابلاغ عن هذا الاعلان من قبل' , null, $request->lang );
-            return response()->json($response , 406);
-        }else{
+        $reported = Product_report::where('product_id', $request->product_id)->where('user_id', $user->id)->first();
+        if ($reported) {
+            $response = APIHelpers::createApiResponse(true, 406, 'this ad reported before', 'تم الابلاغ عن هذا الاعلان من قبل', null, $request->lang);
+            return response()->json($response, 406);
+        } else {
             $favorite = new Product_report();
             $favorite->user_id = $user->id;
             $favorite->product_id = $request->product_id;
             $favorite->save();
-            $response = APIHelpers::createApiResponse(false , 200 ,  '', '' , $favorite, $request->lang);
-            return response()->json($response , 200);
+            $response = APIHelpers::createApiResponse(false, 200, '', '', $favorite, $request->lang);
+            return response()->json($response, 200);
         }
     }
-    public function make_comment(Request $request){
+
+    public function make_comment(Request $request)
+    {
         $user = auth()->user();
-        if($user->active == 0){
-            $response = APIHelpers::createApiResponse(true , 406 ,  'your account blocked', 'تم حظر حسابك' , null, $request->lang );
-            return response()->json($response , 406);
+        if ($user->active == 0) {
+            $response = APIHelpers::createApiResponse(true, 406, 'your account blocked', 'تم حظر حسابك', null, $request->lang);
+            return response()->json($response, 406);
         }
-        $validator = Validator::make($request->all() , [
+        $validator = Validator::make($request->all(), [
             'comment' => 'required',
             'product_id' => 'required|exists:products,id',
         ]);
-        if($validator->fails()) {
-            $response = APIHelpers::createApiResponse(true , 406 ,  $validator->errors()->first(), $validator->errors()->first() , null, $request->lang );
-            return response()->json($response , 406);
+        if ($validator->fails()) {
+            $response = APIHelpers::createApiResponse(true, 406, $validator->errors()->first(), $validator->errors()->first(), null, $request->lang);
+            return response()->json($response, 406);
         }
-            $comment = new Product_comment();
-            $comment->comment = $request->comment;
-            $comment->user_id = $user->id;
-            $comment->product_id = $request->product_id;
-            $comment->save();
+        $comment = new Product_comment();
+        $comment->comment = $request->comment;
+        $comment->user_id = $user->id;
+        $comment->product_id = $request->product_id;
+        $comment->save();
 
-            $response = APIHelpers::createApiResponse(false , 200 ,  'commented successfully', 'تم التعليق بنجاح' , $comment, $request->lang);
-            return response()->json($response , 200);
+        $response = APIHelpers::createApiResponse(false, 200, 'commented successfully', 'تم التعليق بنجاح', $comment, $request->lang);
+        return response()->json($response, 200);
 
     }
-
 
 
 }

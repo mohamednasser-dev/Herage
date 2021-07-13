@@ -33,7 +33,9 @@ use Illuminate\Http\Request;
         'prefix' => 'user'
     ], function($router) {
         Route::get('select_my_data/{lang}/{v}' , 'UserController@select_my_data');
-        Route::post('profile/{lang}/{v}' , 'UserController@updateprofile');
+        Route::get('get_account_types/{lang}/{v}' , 'UserController@get_account_types');
+        Route::get('get_specialties/{lang}/{v}' , 'UserController@get_specialties');
+        Route::post('update_profile/{lang}/{v}' , 'UserController@updateprofile');
         Route::put('resetpassword/{lang}/{v}' , 'UserController@resetpassword');
         Route::put('resetforgettenpassword/{lang}/{v}' , 'UserController@resetforgettenpassword')->middleware('checkguest');
         Route::post('checkphoneexistance/{lang}/{v}' , 'UserController@checkphoneexistance')->middleware('checkguest');

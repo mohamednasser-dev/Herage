@@ -27,32 +27,19 @@ class HomeController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['city_filter','balance_packages', 'gethome', 'getHomeAds', 'check_ad', 'main_ad']]);
+        //        --------------------------------------------- begin scheduled functions --------------------------------------------------------
+            $expired = Product::where('status', 1)->whereDate('expiry_date', '<', Carbon::now())->get();
+            foreach ($expired as $row) {
+                $product = Product::find($row->id);
+                $product->status = 2;
+                $product->re_post = '0';
+                $product->save();
+            }
+        //        --------------------------------------------- end scheduled functions --------------------------------------------------------
     }
 
     public function gethome(Request $request)
     {
-//        --------------------------------------------- begin scheduled functions --------------------------------------------------------
-
-        $mytime = Carbon::now();
-        $today = Carbon::parse($mytime->toDateTimeString())->format('Y-m-d H:i');
-
-        $pin_ad = Setting::where('id', 1)->whereDate('free_loop_date', '<', Carbon::now())->first();
-        if ($pin_ad != null) {
-            if ($pin_ad->is_loop_free_balance == 'y') {
-                $all_users = User::where('active', 1)->get();
-                foreach ($all_users as $row) {
-                    $user = User::find($row->id);
-                    $user->my_wallet = $user->my_wallet + $pin_ad->free_loop_balance;
-                    $user->free_balance = $user->free_balance + $pin_ad->free_loop_balance;
-                    $user->save();
-                }
-                $final_pin_date = Carbon::createFromFormat('Y-m-d H:i', $today);
-                $final_free_loop_date = $final_pin_date->addDays($pin_ad->free_loop_period);
-                $pin_ad->free_loop_date = $final_free_loop_date;
-                $pin_ad->save();
-            }
-        }
-//        --------------------------------------------- end scheduled functions --------------------------------------------------------
 
         $data['slider'] = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->get();
         $data['ads'] = Ad::select('id', 'image', 'type', 'content')->where('place', 2)->get();
@@ -129,7 +116,7 @@ class HomeController extends Controller
             ->whereIn('category_id', $cat_ids)
             ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
             ->orderBy('created_at', 'desc')
-            ->simplePaginate(12);
+            ->simplePaginate(12)->makeHidden(['City','Area']);
         for ($i = 0; $i < count($products); $i++) {
                 if($lang == 'ar'){
                     $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
@@ -172,7 +159,8 @@ class HomeController extends Controller
         $data = Main_ad::select('image')->where('deleted', '0')->inRandomOrder()->take(1)->get();
         if (count($data) == 0) {
             $response = APIHelpers::createApiResponse(true, 406, 'no ads available',
-                'لا يوجد اعلانات', null, $request->lang);
+                'ل
+                 يوجد اعلانات', null, $request->lang);
             return response()->json($response, 406);
         }
         foreach ($data as $image) {

@@ -6,6 +6,8 @@ return [
 
 
     'reports' => "البلاغات",
+    'expier_days' => "عدد أيام انتهاء الاعلان",
+    'specialties' => "التخصصات",
     'reporter_name' => "اسم مقدم البلاغ",
     'ad_name' => "اسم الاعلان",
     'published_unpublish' => "نشر / تعطيل",

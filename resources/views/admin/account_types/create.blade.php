@@ -10,7 +10,7 @@
                         <h4>{{ __('messages.add') }}</h4>
                     </div>
                 </div>
-            </div>m
+            </div>
             <form action="{{route('account_types.store')}}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="form-group mb-4">

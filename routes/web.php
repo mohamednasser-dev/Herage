@@ -208,6 +208,10 @@ Route::group(['middleware'=>'language','prefix' => "admin-panel",'namespace' => 
     Route::resource('account_types', 'AccountTypesController');
     Route::post('account_types/update/{id}', 'AccountTypesController@update')->name('account_types.update.new');
     Route::get('account_types/delete/{id}' , 'AccountTypesController@destroy')->name("account_types.delete");
+    // Specialty types Route
+    Route::resource('specialty', 'SpecialtyController');
+    Route::post('specialty/update/{id}', 'SpecialtyController@update')->name('specialty.update.new');
+    Route::get('specialty/delete/{id}' , 'SpecialtyController@destroy')->name("specialty.delete");
 
     // Notifications Route
     Route::group(["prefix" => "notifications"], function($router){
