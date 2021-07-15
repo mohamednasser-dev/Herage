@@ -62,6 +62,7 @@ class ChatController extends Controller
             ->map(function ($convs) {
                 $other_user = Participant::where('conversation_id', $convs->conversation_id)->where('user_id', '!=', auth()->user()->id)->first();
                 $convs->other_user_id = $other_user->User->id;
+                $convs->ad_name = $convs->Ad_product->title;
                 $convs->user_name = $other_user->User->name;
                 $convs->image = $other_user->User->image;
                 $convs->last_message = $other_user->Conversation->Message->message;
@@ -173,7 +174,7 @@ class ChatController extends Controller
                 }
                 //begin use firebase to send message
                 $fb_token = $other_user->User->fcm_token;
-                if ($قrequest->lang == 'ar') {
+                if ($request->lang == 'ar') {
                     $title = 'رسالة من تطبيق جلف';
                 } else {
                     $title = 'message  from gulf app';

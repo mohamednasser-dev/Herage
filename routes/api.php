@@ -198,6 +198,7 @@ use Illuminate\Http\Request;
 
     //auth routes
     Route::get('/my_account/{lang}/{v}' , 'UserController@my_account');
+    Route::get('/retweet/{ad_id}/{lang}/{v}' , 'UserController@retweet');
     Route::get('/my_balance/{lang}/{v}' , 'UserController@my_balance');
 
     Route::group([
@@ -221,7 +222,7 @@ use Illuminate\Http\Request;
 
 
     Route::get('/ad/cities/{lang}/{v}' , 'ProductController@cities');
-    Route::get('/ad/areas/{lang}/{v}' , 'ProductController@areas');
+Route::get('/ad/areas/{city_id}/{lang}/{v}' , 'ProductController@areas');
     Route::get('/ad/last_seen/{lang}/{v}' , 'ProductController@last_seen');
     Route::get('/ad/offer_ads/{lang}/{v}' , 'ProductController@offer_ads');
     Route::get('/payments_date/{lang}/{v}' , 'UserController@payments_date');

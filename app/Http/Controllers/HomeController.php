@@ -2,24 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Participant;
-use App\Product_view;
-use App\SubCategory;
-use App\SubTwoCategory;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use App\Helpers\APIHelpers;
 use App\Balance_package;
+use App\SubTwoCategory;
 use App\ProductImage;
-use App\Plan_details;
+use App\Participant;
+use App\SubCategory;
 use Carbon\Carbon;
 use App\Favorite;
 use App\Category;
 use App\Product;
 use App\Main_ad;
-use App\Setting;
-use App\User;
 use App\Ad;
-use Illuminate\Support\Facades\Session;
 
 
 class HomeController extends Controller
@@ -40,7 +36,6 @@ class HomeController extends Controller
 
     public function gethome(Request $request)
     {
-
         $data['slider'] = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->get();
         $data['ads'] = Ad::select('id', 'image', 'type', 'content')->where('place', 2)->get();
         $data['categories'] = Category::select('id', 'image', 'title_ar as title')->where('deleted', 0)->get();
@@ -66,10 +61,7 @@ class HomeController extends Controller
     }
 
     public function getHomeAds(Request $request){
-
         $one = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->get();
-
-
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         $user = auth()->user();
@@ -108,7 +100,6 @@ class HomeController extends Controller
         }
 
         $data['categories'] = $categories;
-
         $products = Product::where('status', 1)
             ->with('Publisher')
             ->where('publish', 'Y')
@@ -123,7 +114,6 @@ class HomeController extends Controller
                 }else{
                     $products[$i]['address'] = $products[$i]['City']->title_en .' , '.$products[$i]['Area']->title_en;
                 }
-
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
                 if ($favorite) {
@@ -144,10 +134,8 @@ class HomeController extends Controller
             }
             $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
         }
-
         $data['products'] = $products;
         $data['ads'] = $one;
-
         $response = APIHelpers::createApiResponse(false, 200, '', '', $data, $request->lang);
         return response()->json($response, 200);
     }
@@ -172,6 +160,8 @@ class HomeController extends Controller
     public function city_filter(Request $request,$area_id)
     {
         $user = auth()->user();
+        $lang = $request->lang;
+        Session::put('api_lang', $lang);
         $lang = $request->lang;
         $products = Product::where('status', 1)
                             ->with('Publisher')

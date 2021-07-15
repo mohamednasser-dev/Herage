@@ -77,6 +77,43 @@ class UserController extends Controller
         $response = APIHelpers::createApiResponse(false, 200, '', '', $data, $lang);
         return response()->json($response, 200);
     }
+    public function retweet(Request $request,$ad_id)
+    {
+
+        $lang = $request->lang;
+        Session::put('api_lang', $lang);
+
+        $data = Product::find($ad_id);
+        if($data){
+            if($data->retweet == 0){
+
+
+                //create expier day
+                $settings = Setting::find(1);
+                $mytime = Carbon::now();
+                $today = Carbon::parse($mytime->toDateTimeString())->format('Y-m-d H:i');
+                $final_pin_date = Carbon::createFromFormat('Y-m-d H:i', $today);
+                $final_expire_pin_date = $final_pin_date->addDays($settings->expier_days);
+
+                $data->expiry_date = $final_expire_pin_date;
+                $data->created_at = $mytime;
+                $data->status = 1;
+                $data->retweet = 1 ;
+                $data->save();
+
+                $response = APIHelpers::createApiResponse(false, 200, 'retweet used successfully', 'تم استخدام الريتويت بنجاح', $data, $lang);
+                return response()->json($response, 200);
+            }else{
+                $response = APIHelpers::createApiResponse(true, 406, 'retweet used before', 'تم أستخدام الريتويت من قبل', (object)[], $request->lang);
+                return response()->json($response, 406);
+            }
+
+        }else{
+            $response = APIHelpers::createApiResponse(true, 406, 'you should choose valid ad', 'يجب اختيار اعلان صحيح', (object)[], $request->lang);
+            return response()->json($response, 406);
+        }
+
+    }
 
     public function get_specialties(Request $request)
     {
@@ -615,10 +652,14 @@ class UserController extends Controller
         $products = Product::with('City')->with('Area')->where('status', 2)
             ->where('deleted', 0)
             ->where('user_id', auth()->user()->id)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id','retweet')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
+
+            if( $products[$i]['retweet_date'] < Carbon::now()){
+                $products[$i]['retweet'] = 1;
+            }
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
             } else {
@@ -649,10 +690,15 @@ class UserController extends Controller
             ->where('publish', 'Y')
             ->where('deleted', 0)
             ->where('user_id', auth()->user()->id)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id','retweet')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($current_products); $i++) {
+
+            if( $current_products[$i]['retweet_date'] < Carbon::now()){
+                $current_products[$i]['retweet'] = 1;
+            }
+
             if ($lang == 'ar') {
                 $current_products[$i]['address'] = $current_products[$i]['City']->title_ar . ' , ' . $current_products[$i]['Area']->title_ar;
             } else {

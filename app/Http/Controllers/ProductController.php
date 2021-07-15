@@ -158,9 +158,7 @@ class ProductController extends Controller
         return response()->json($response, 200);
     }
 
-    public function getdetails(Request $request)
-    {
-
+    public function getdetails(Request $request){
         $user = auth()->user();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
@@ -595,7 +593,6 @@ class ProductController extends Controller
     public function save_first_step(Request $request)
     {
         $input = $request->all();
-
         $validator = Validator::make($input, [
             'category_id' => 'required',
             'sub_category_id' => '',
@@ -633,13 +630,20 @@ class ProductController extends Controller
                 if ($input['price'] == null) {
                     $input['price'] = '0';
                 }
+
                 //create expier day
                 $settings = Setting::find(1);
                 $mytime = Carbon::now();
                 $today = Carbon::parse($mytime->toDateTimeString())->format('Y-m-d H:i');
+                $final_retweet_date = Carbon::createFromFormat('Y-m-d H:i', $today);
                 $final_pin_date = Carbon::createFromFormat('Y-m-d H:i', $today);
                 $final_expire_pin_date = $final_pin_date->addDays($settings->expier_days);
                 $input['expiry_date'] = $final_expire_pin_date;
+
+                //to make retweet date
+                $final_retweet_date_date = $final_retweet_date->addDays(1);
+                $input['retweet_date'] = $final_retweet_date_date;
+
                 $ad_data = Product::create($input);
 
                 //save product feature ...
@@ -1503,19 +1507,21 @@ class ProductController extends Controller
         return response()->json($response, 200);
     }
 
-    public function areas(Request $request)
+    public function areas( Request $request , $city_id )
     {
         Session::put('api_lang', $request->lang);
+
+        $areas = [];
         if ($request->lang == 'en') {
-            $areas = Area::where('deleted', '0')
+            $areas = Area::where('city_id',$city_id)->where('deleted', '0')
                 ->select('id', 'title_en as title')
                 ->get();
         } else {
-            $areas = Area::where('deleted', '0')
+            $areas = Area::where('city_id',$city_id)->where('deleted', '0')
                 ->select('id', 'title_ar as title')
                 ->get();
         }
-        $response = APIHelpers::createApiResponse(false, 200, '', '', array('areas' => $areas), $request->lang);
+        $response = APIHelpers::createApiResponse(false, 200, '', '', $areas, $request->lang);
         return response()->json($response, 200);
     }
 

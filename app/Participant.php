@@ -10,7 +10,7 @@ class Participant extends Model
 
     public function Ad_product()
     {
-        return $this->belongsTo('App\AdProduct', 'ad_product_id');
+        return $this->belongsTo('App\Product', 'ad_product_id')->select('id','title');
     }
     public function User()
     {
