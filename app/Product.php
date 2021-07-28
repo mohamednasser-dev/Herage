@@ -15,6 +15,10 @@ class Product extends Model
     public function category() {
         return $this->belongsTo('App\Category', 'category_id');
     }
+    public function Sub_category() {
+
+        return $this->belongsTo('App\SubCategory', 'sub_category_id')->select('id','title_'.session('api_lang').' as title');
+    }
     public function user() {
         return $this->belongsTo('App\User', 'user_id');
     }

@@ -141,6 +141,7 @@ use Illuminate\Http\Request;
 
     //search ads
     Route::post('/ads/search/{lang}/{v}' , 'ProductController@getsearch');
+    Route::get('/map/ads/{lang}/{v}' , 'ProductController@map_ads');
     Route::post('/ads/filter/{lang}/{v}' , 'ProductController@filter');
     Route::get('/ad/max_min_price/{lang}/{v}' , 'ProductController@max_min_price');
 

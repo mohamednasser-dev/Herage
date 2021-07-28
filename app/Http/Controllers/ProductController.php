@@ -40,7 +40,7 @@ class ProductController extends Controller
     {
         $this->middleware('auth:api', ['except' => ['select_my_ads', 'all_comments', 'make_comment', 'make_report', 'ad_owner_info', 'current_ads', 'ended_ads', 'max_min_price', 'filter', 'offer_ads', 'republish_ad',
             'areas', 'cities', 'third_step_excute_pay', 'save_third_step_with_money', 'update_ad', 'select_ad_data', 'delete_my_ad',
-            'save_third_step', 'save_second_step', 'save_first_step', 'getdetails', 'last_seen', 'getoffers', 'getproducts', 'getsearch', 'getFeatureOffers']]);
+            'save_third_step', 'save_second_step', 'save_first_step', 'getdetails', 'last_seen', 'getoffers', 'getproducts','map_ads', 'getsearch', 'getFeatureOffers']]);
         //        --------------------------------------------- begin scheduled functions --------------------------------------------------------
         $expired = Product::where('status', 1)->whereDate('expiry_date', '<', Carbon::now())->get();
         foreach ($expired as $row) {
@@ -445,6 +445,45 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
+            $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
+            $products[$i]['views'] = $views;
+            $user = auth()->user();
+            if ($user) {
+                $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
+                if ($favorite) {
+                    $products[$i]['favorite'] = true;
+                } else {
+                    $products[$i]['favorite'] = false;
+                }
+            } else {
+                $products[$i]['favorite'] = false;
+            }
+            $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
+        }
+        $response = APIHelpers::createApiResponse(false, 200, '', '', $products, $request->lang);
+        return response()->json($response, 200);
+
+    }
+
+    //to get map ads establish
+    public function map_ads(Request $request)
+    {
+        $lang = $request->lang;
+        Session::put('api_lang', $lang);
+        $products = Product::where('publish', 'Y')->with('Publisher')->with('Sub_category')
+            ->where('deleted', 0)
+            ->where('status', 1)
+            ->where('category_id',7)
+            ->select('id', 'title', 'price','sub_category_id', 'main_image as image', 'created_at', 'pin','city_id','area_id', 'user_id','latitude','longitude')
+            ->orderBy('pin', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get()->makeHidden(['City','Area']);
+        for ($i = 0; $i < count($products); $i++) {
+            if($lang == 'ar'){
+                $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
+            }else{
+                $products[$i]['address'] = $products[$i]['City']->title_en .' , '.$products[$i]['Area']->title_en;
+            }
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
