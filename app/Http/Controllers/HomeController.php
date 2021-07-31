@@ -61,7 +61,7 @@ class HomeController extends Controller
     }
 
     public function getHomeAds(Request $request){
-        $one = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->get();
+        $ads = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->get();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         $user = auth()->user();
@@ -134,8 +134,40 @@ class HomeController extends Controller
             }
             $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
         }
-        $data['products'] = $products;
-        $data['ads'] = $one;
+
+        $new_ad = [];
+        for ($i = 0; $i < count($products); $i++) {
+
+            if ((($i+1) % 2) == 0) {
+                $ad = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->inRandomOrder()->first();
+                if($ad){
+
+                    $ad->id = 0;
+                    $ad->title = $ad->content;
+                    $ad->user_id = 0;
+                    $ad->created_at = Carbon::now();
+
+                    $ad->city_id = 0;
+                    $ad->area_id = 0;
+                    $ad->address = $ad->type;
+                    $ad->favorite =false;
+                    $ad->conversation_id =0;
+                    $ad->time ="";
+                    $ad->publisher = (object)[];
+                    
+                    array_push($new_ad , $products[$i]);
+                    array_push($new_ad , $ad);
+
+                }
+            }else{
+
+
+                array_push($new_ad , $products[$i]);
+            }
+
+        }
+
+        $data['products'] = $new_ad;
         $response = APIHelpers::createApiResponse(false, 200, '', '', $data, $request->lang);
         return response()->json($response, 200);
     }
