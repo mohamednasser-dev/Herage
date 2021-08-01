@@ -1149,7 +1149,7 @@ class ProductController extends Controller
                     $data[$inc]['id'] = $product->id;
                     $data[$inc]['title'] = $product->title;
                     $data[$inc]['image'] = $product->main_image;
-                    $data[$inc]['price'] = $product->price;
+                    $data[$inc]['price'] = number_format((float)($product->price), 3) ;
                     $data[$inc]['description'] = $product->description;
                     $favorite = Favorite::where('user_id', $user->id)->where('product_id', $product->id)->first();
                     if ($favorite) {
