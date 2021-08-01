@@ -106,7 +106,12 @@ class AuthController extends Controller
         $free_balance = $setting['free_balance'];
 
         $user = new User();
-        $user->account_type = $request->account_type;
+        if($request->account_type =='personal'){
+            $user->account_type = 1;
+        }else{
+            $user->account_type = 2;
+        }
+
         $user->name = $request->name;
         $user->phone = $request->phone;
         $user->email = $request->email;
