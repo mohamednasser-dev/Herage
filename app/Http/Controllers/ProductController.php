@@ -187,7 +187,7 @@ class ProductController extends Controller
                 Product_view::create($data_view);
             }
         } else {
-            $prod_view = Product_view::where('ip', $user_ip_address)->where('product_id', $data->id)->first();
+            $prod_view = Product_view::where('user_id', $user->id)->where('product_id', $data->id)->first();
             if ($prod_view == null) {
                 $data_view['user_id'] = $user->id;
                 $data_view['ip'] = $user_ip_address;

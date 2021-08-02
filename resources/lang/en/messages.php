@@ -3,6 +3,21 @@
         //new
 
 
+        'reports' => "reports",
+        'expier_days' => "Advertisement expiry days",
+        'specialties' => "Specialties",
+        'reporter_name' => "Author's name",
+        'ad_name' => "Ad name",
+        'published_unpublish' => "publish / disable",
+        'published_s' => "Ad has been posted",
+        'not_published_s' => "Ad is disabled",
+        'ads_posters' => "basic ads",
+        'comments' => "Ads Comments",
+        'comment' => "comment",
+        'approval' => "consent",
+        'reject' => "reject",
+        'accepted_done' => "Successfully approved",
+        'rejected_done' => "Successfully rejected",
 
         'ecomercial_account_types' => "Business account types",
         'our_offers' => "our offers",
