@@ -124,7 +124,7 @@ class CategoryController extends Controller
             ->where('category_id', $request->category_id)->select('id', 'title', 'price', 'main_image as image', 'created_at', 'pin')
             ->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
-            $products[$i]['price'] = number_format((float)(  $products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
@@ -256,7 +256,7 @@ class CategoryController extends Controller
             $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('sub_category_id', $request->sub_category_id)->select('id', 'title', 'price', 'main_image as image', 'created_at', 'pin')->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
         }
         for ($i = 0; $i < count($products); $i++) {
-            $products[$i]['price'] = number_format((float)(  $products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
@@ -467,7 +467,7 @@ class CategoryController extends Controller
         $products = $products->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
 
         for ($i = 0; $i < count($products); $i++) {
-            $products[$i]['price'] = number_format((float)(  $products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
@@ -642,7 +642,7 @@ class CategoryController extends Controller
 
         $products = $products->select('id', 'title', 'price', 'main_image as image', 'pin', 'created_at')->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
-            $products[$i]['price'] = number_format((float)(  $products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
@@ -774,7 +774,7 @@ class CategoryController extends Controller
         }
         $products = $products->select('id', 'title', 'price', 'main_image as image', 'pin', 'created_at')->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
-            $products[$i]['price'] = number_format((float)(  $products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
@@ -871,7 +871,7 @@ class CategoryController extends Controller
         }
         $products = $products->where('sub_category_five_id', $request->sub_category_id)->select('id', 'title', 'price', 'main_image as image', 'pin', 'created_at')->where('publish', 'Y')->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
-            $products[$i]['price'] = number_format((float)(  $products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
@@ -1014,15 +1014,15 @@ class CategoryController extends Controller
 
 
     // get category options
-    public function getCategoryOptions(Request $request, Category $category)
+    public function getCategoryOptions(Request $request)
     {
-        if ($request->lang == 'en') {
-            $data['options'] = Category_option::where('cat_id', $category['id'])->where('cat_type', 'category')->where('deleted', '0')->select('id as option_id', 'title_en as title', 'is_required')->get();
-
+        $lang = $request->lang;
+        if ($request->category_id != 0 && $request->sub_category_id == 0 && $request->sub_two_category_id == 0) {
+            $data['options'] = Category_option::where('cat_id', $request->category_id)->where('cat_type', 'category')->where('deleted', '0')->select('id as option_id', 'title_' . $lang . ' as title', 'is_required')->get();
             if (count($data['options']) > 0) {
                 for ($i = 0; $i < count($data['options']); $i++) {
                     $data['options'][$i]['type'] = 'input';
-                    $optionValues = Category_option_value::where('option_id', $data['options'][$i]['option_id'])->where('deleted', '0')->select('id as value_id', 'value_en as value')->get();
+                    $optionValues = Category_option_value::where('option_id', $data['options'][$i]['option_id'])->where('deleted', '0')->select('id as value_id', 'value_' . $lang . ' as value')->get();
                     if (count($optionValues) > 0) {
 
                         $data['options'][$i]['type'] = 'select';
@@ -1030,15 +1030,79 @@ class CategoryController extends Controller
                     }
                 }
             }
-        } else {
-            $data['options'] = Category_option::where('cat_id', $category['id'])->where('cat_type', 'category')->where('deleted', '0')->select('id as option_id', 'title_ar as title', 'is_required')->get();
+        } else if ($request->category_id != 0 && $request->sub_category_id != 0 && $request->sub_two_category_id == 0) {
+            $data['options'] = Category_option::where('cat_id', $request->sub_category_id)->where('cat_type', 'subcategory')->where('deleted', '0')->select('id as option_id', 'title_' . $lang . ' as title', 'is_required')->get();
             if (count($data['options']) > 0) {
                 for ($i = 0; $i < count($data['options']); $i++) {
                     $data['options'][$i]['type'] = 'input';
-                    $optionValues = Category_option_value::where('option_id', $data['options'][$i]['option_id'])->where('deleted', '0')->select('id as value_id', 'value_ar as value')->get();
+                    $optionValues = Category_option_value::where('option_id', $data['options'][$i]['option_id'])->where('deleted', '0')->select('id as value_id', 'value_' . $lang . ' as value')->get();
                     if (count($optionValues) > 0) {
+
                         $data['options'][$i]['type'] = 'select';
                         $data['options'][$i]['values'] = $optionValues;
+                    }
+                }
+            }
+            if (count($data['options']) == 0) {
+                    $data['options'] = Category_option::where('cat_id', $request->category_id)->where('cat_type', 'category')->where('deleted', '0')->select('id as option_id', 'title_en as title', 'is_required')->get();
+                    if (count($data['options']) > 0) {
+                        for ($i = 0; $i < count($data['options']); $i++) {
+                            $data['options'][$i]['type'] = 'input';
+                            $optionValues = Category_option_value::where('option_id', $data['options'][$i]['option_id'])->where('deleted', '0')->select('id as value_id', 'value_en as value')->get();
+                            if (count($optionValues) > 0) {
+                                $data['options'][$i]['type'] = 'select';
+                                $data['options'][$i]['values'] = $optionValues;
+                            }
+                        }
+                    }
+
+            }
+        } else if ($request->category_id != 0 && $request->sub_category_id != 0 && $request->sub_two_category_id != 0) {
+            $lang = $request->lang;
+            $data['options'] = [];
+            if ($request->sub_two_category_id != 0) {
+                $data['options'] = Category_option::where('cat_id', $request->sub_two_category_id)->where('cat_type', 'subTwoCategory')->where('deleted', '0')->select('id as option_id', 'title_' . $lang . ' as title', 'is_required')->get();
+                if (count($data['options']) > 0) {
+                    for ($i = 0; $i < count($data['options']); $i++) {
+                        $data['options'][$i]['type'] = 'input';
+                        $optionValues = Category_option_value::where('option_id', $data['options'][$i]['option_id'])->where('deleted', '0')->select('id as value_id', 'value_' . $lang . ' as value')->get();
+                        if (count($optionValues) > 0) {
+                            $data['options'][$i]['type'] = 'select';
+                            $data['options'][$i]['values'] = $optionValues;
+                        }
+                    }
+                }
+            }
+
+            if ($request->sub_category_id != 0) {
+                if (count($data['options']) == 0) {
+                    $data['options'] = Category_option::where('cat_id', $request->sub_category_id)->where('cat_type', 'subcategory')->where('deleted', '0')->select('id as option_id', 'title_' . $lang . ' as title', 'is_required')->get();
+                    if (count($data['options']) > 0) {
+                        for ($i = 0; $i < count($data['options']); $i++) {
+                            $data['options'][$i]['type'] = 'input';
+                            $optionValues = Category_option_value::where('option_id', $data['options'][$i]['option_id'])->where('deleted', '0')->select('id as value_id', 'value_' . $lang . ' as value')->get();
+                            if (count($optionValues) > 0) {
+                                $data['options'][$i]['type'] = 'select';
+                                $data['options'][$i]['values'] = $optionValues;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            if ($request->category_id != 0) {
+                if (count($data['options']) == 0) {
+                    $data['options'] = Category_option::where('cat_id', $request->category_id)->where('cat_type', 'category')->where('deleted', '0')->select('id as option_id', 'title_' . $lang . ' as title', 'is_required')->get();
+                    if (count($data['options']) > 0) {
+                        for ($i = 0; $i < count($data['options']); $i++) {
+                            $data['options'][$i]['type'] = 'input';
+                            $optionValues = Category_option_value::where('option_id', $data['options'][$i]['option_id'])->where('deleted', '0')->select('id as value_id', 'value_' . $lang . ' as value')->get();
+                            if (count($optionValues) > 0) {
+                                $data['options'][$i]['type'] = 'select';
+                                $data['options'][$i]['values'] = $optionValues;
+                            }
+                        }
                     }
                 }
             }
