@@ -640,8 +640,8 @@ class ProductController extends Controller
             'images' => '',
             'city_id' => 'required|exists:cities,id',
             'area_id' => 'required|exists:areas,id',
-            'latitude' => 'required',
-            'longitude' => 'required',
+            'latitude' => '',
+            'longitude' => '',
             'options' => ''
         ]);
         if ($validator->fails()) {
@@ -1452,8 +1452,8 @@ class ProductController extends Controller
             'city_id' => 'required',
             'area_id' => 'required',
             'share_location' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
+            'latitude' => '',
+            'longitude' => '',
             'options' => '',
             'price' => 'required|numeric',
             'description' => '',

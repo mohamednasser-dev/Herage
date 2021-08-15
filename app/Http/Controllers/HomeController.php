@@ -76,15 +76,19 @@ class HomeController extends Controller
             $cat_ids[$i] = $categories[$i]['id'];
             $categories[$i]['products_count'] = Product::where('category_id', $categories[$i]['id'])->where('status', 1)->where('publish', 'Y')->where('deleted', 0)->count();
             //text next level
-            $subTwoCats = SubCategory::where('category_id', $categories[$i]['id'])->where('deleted', 0)->select('id')->first();
-            $categories[$i]['next_level'] = false;
-            if (isset($subTwoCats['id'])) {
+            $subTwoCats = SubCategory::where('category_id', $categories[$i]['id'])->where('deleted', 0)->select('id')->get()->count();
+
+            if($subTwoCats > 0){
                 $categories[$i]['next_level'] = true;
+            }else{
+                $categories[$i]['next_level'] = false;
             }
+
             if ($categories[$i]['next_level'] == true) {
                 // check after this level layers
                 $data_ids = SubCategory::where('deleted', '0')->where('category_id', $categories[$i]['id'])->select('id')->get()->toArray();
                 $subFiveCats = SubTwoCategory::whereIn('sub_category_id', $data_ids)->where('deleted', 0)->select('id', 'deleted')->get();
+
                 if (count($subFiveCats) == 0) {
                     $have_next_level = false;
                 } else {
