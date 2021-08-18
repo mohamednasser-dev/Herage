@@ -644,6 +644,19 @@ class UserController extends Controller
             ->where('id', $user->id)
             ->select('name', 'email', 'about_user', 'image', 'cover', 'phone', 'watsapp', 'city_id', 'area_id', 'account_type', 'created_at')
             ->first();
+
+        $user_specialties = User_specialty::with('Specialty')
+            ->select('special_id')
+            ->where('user_id', $user->id)->get();
+        $spec = "";
+        foreach ($user_specialties as $row) {
+            if ($lang == 'ar') {
+                $spec = $spec . ',' . $row->Specialty->name;
+            } else {
+                $spec = $spec . ',' . $row->Specialty->name;
+            }
+        }
+        $data['personal_data']->specialties = $spec;
         if ($data['personal_data']->city_id != null && $data['personal_data']->area_id != null) {
             $data['personal_data']->address = $data['personal_data']->City->title_ar . ' , ' . $data['personal_data']->Area->title_ar;
         } else {
