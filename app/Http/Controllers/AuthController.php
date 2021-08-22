@@ -84,7 +84,7 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $response = APIHelpers::createApiResponse(true , 406 ,  'بعض الحقول مفقودة', 'بعض الحقول مفقودة' , null, $request->lang);
+            $response = APIHelpers::createApiResponse(true , 406 ,  $validator->errors()->first(),  $validator->errors()->first(), null, $request->lang);
             return response()->json($response , 406);
         }
 
