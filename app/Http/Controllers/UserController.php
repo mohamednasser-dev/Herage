@@ -181,15 +181,15 @@ class UserController extends Controller
         $input = $request->all();
         $user = auth()->user();
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'phone' => 'required',
-            "email" => 'required',
+            'name' => '',
+            'phone' => '',
+            "email" => '',
             "image" => '',
             "city_id" => '',
             "area_id" => '',
             "cover" => '',
             "about_user" => '',
-            "account_type" => 'required',
+            "account_type" => '',
             "specialties" => '',
         ]);
 
