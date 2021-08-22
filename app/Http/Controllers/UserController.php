@@ -640,7 +640,6 @@ class UserController extends Controller
 
         $lang = $request->lang;
         $user = auth()->user();
-        dd($user->id);
         Session::put('api_lang', $lang);
         $data['personal_data'] = User::with('City')->with('Area')
             ->where('id', $user->id)
