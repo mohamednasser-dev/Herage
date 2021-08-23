@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Participant;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Helpers\APIHelpers;
@@ -73,6 +74,8 @@ class FavoriteController extends Controller
 
     public function getfavorites(Request $request){
         $user = auth()->user();
+        $lang = $request->lang ;
+        Session::put('api_lang', $lang);
         if($user->active == 0){
             $response = APIHelpers::createApiResponse(true , 406 ,  'تم حظر حسابك', 'تم حظر حسابك' , null, $request->lang );
             return response()->json($response , 406);
@@ -119,12 +122,7 @@ class FavoriteController extends Controller
                     $products[$i]['conversation_id'] = 0;
                 }
             }
-
-            if(count($products) > 0) {
-                $response = APIHelpers::createApiResponse(false, 200, '', '', $products, $request->lang);
-            }else{
-                $response = APIHelpers::createApiResponse(false, 200, 'no item favorite to show', 'لا يوجد عناصر للعرض', null, $request->lang);
-            }
+            $response = APIHelpers::createApiResponse(false, 200, '', '', $products, $request->lang);
             return response()->json($response, 200);
         }
     }
