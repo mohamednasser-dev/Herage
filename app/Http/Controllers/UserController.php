@@ -641,7 +641,7 @@ class UserController extends Controller
         $lang = $request->lang;
         $user = auth()->user();
         Session::put('api_lang', $lang);
-        $data['personal_data'] = User::with('City')->with('Area')
+        $data['personal_data'] = User::with('City')->with('Area')->with('Account_type')
             ->where('id', $user->id)
             ->select('name', 'email', 'about_user', 'image', 'cover', 'phone', 'watsapp', 'city_id', 'area_id', 'account_type', 'created_at')
             ->first();

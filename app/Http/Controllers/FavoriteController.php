@@ -102,6 +102,11 @@ class FavoriteController extends Controller
 //                }
 //            }
             for ($i = 0; $i < count($products); $i++) {
+                if($lang == 'ar'){
+                    $products[$i]['Product']->address = $products[$i]['Product']->City->title_ar .' , '.$products[$i]['Product']->Area->title_ar;
+                }else{
+                    $products[$i]['Product']->address = $products[$i]['Product']->City->title_en .' , '.$products[$i]['Product']->Area->title_en;
+                }
                 $products[$i]['Product']->price  = number_format((float)(  $products[$i]['Product']->price ), 3);
                 if ($user) {
                     $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['product_id'])->first();
@@ -118,9 +123,10 @@ class FavoriteController extends Controller
                         $products[$i]['Product']->conversation_id = $conversation->conversation_id;
                     }
                 } else {
-                    $products[$i]['favorite'] = false;
-                    $products[$i]['conversation_id'] = 0;
+                    $products[$i]['Product']->favorite = false;
+                    $products[$i]['Product']->conversation_id = 0;
                 }
+                $products[$i]['Product']->time = APIHelpers::get_month_day( $products[$i]['Product']->created_at , $lang);
             }
             $response = APIHelpers::createApiResponse(false, 200, '', '', $products, $request->lang);
             return response()->json($response, 200);

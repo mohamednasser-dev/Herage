@@ -1143,28 +1143,13 @@ class ProductController extends Controller
             ->select('product_id', 'user_id')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
-//        $inc = 0;
-//        foreach ($ads as $key => $row) {
-//            $product = Product::where('id', $row->product_id)->first();
-//            if ($product != null) {
-//                if ($product->status == 1 && $product->deleted == 0 && $product->publish == 'Y') {
-//                    $data[$inc]['id'] = $product->id;
-//                    $data[$inc]['title'] = $product->title;
-//                    $data[$inc]['image'] = $product->main_image;
-//                    $data[$inc]['price'] = number_format((float)($product->price), 3) ;
-//                    $data[$inc]['description'] = $product->description;
-//                    $favorite = Favorite::where('user_id', $user->id)->where('product_id', $product->id)->first();
-//                    if ($favorite) {
-//                        $data[$inc]['favorite'] = true;
-//                    } else {
-//                        $data[$inc]['favorite'] = false;
-//                    }
-//                    $inc = $inc + 1;
-//                }
-//            }
-//        }
 
         for ($i = 0; $i < count($products); $i++) {
+            if($lang == 'ar'){
+                $products[$i]['Product']->address = $products[$i]['Product']->City->title_ar .' , '.$products[$i]['Product']->Area->title_ar;
+            }else{
+                $products[$i]['Product']->address = $products[$i]['Product']->City->title_en .' , '.$products[$i]['Product']->Area->title_en;
+            }
             $products[$i]['Product']->price  = number_format((float)(  $products[$i]['Product']->price ), 3);
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['product_id'])->first();
@@ -1181,9 +1166,11 @@ class ProductController extends Controller
                     $products[$i]['Product']->conversation_id = $conversation->conversation_id;
                 }
             } else {
-                $products[$i]['favorite'] = false;
-                $products[$i]['conversation_id'] = 0;
+                $products[$i]['Product']->favorite = false;
+                $products[$i]['Product']->conversation_id = 0;
             }
+
+            $products[$i]['Product']->time = APIHelpers::get_month_day( $products[$i]['Product']->created_at , $lang);
         }
         $response = APIHelpers::createApiResponse(false, 200, '', '', $products, $request->lang);
         return response()->json($response, 200);
