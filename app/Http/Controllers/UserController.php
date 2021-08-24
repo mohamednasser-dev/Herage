@@ -178,6 +178,8 @@ class UserController extends Controller
 
     public function updateprofile(Request $request)
     {
+        $lang = $request->lang ;
+        Session::put('api_lang', $lang);
         $input = $request->all();
         $user = auth()->user();
         $validator = Validator::make($request->all(), [
@@ -244,7 +246,7 @@ class UserController extends Controller
         unset($input['specialties']);
         User::where('id', $currentuser->id)->update($input);
 
-        $newuser = User::find($currentuser->id);
+        $newuser = User::with('Account_type')->find($currentuser->id);
         $response = APIHelpers::createApiResponse(false, 200, '', '', $newuser, $request->lang);
         return response()->json($response, 200);
     }
