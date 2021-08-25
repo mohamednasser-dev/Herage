@@ -275,7 +275,7 @@ class ProductController extends Controller
                     $ads->favorite = false;
                     $ads->conversation_id = 0;
                 }
-
+                $ads->time = APIHelpers::get_month_day( $ads->created_at , $lang);
                 return $ads;
             });
 
