@@ -251,7 +251,7 @@ class ProductController extends Controller
             ->with('Publisher')
             ->select('id','title','main_image','user_id','price','description','created_at','city_id','area_id')
             ->limit(3)
-            ->get()->makeHidden(['City', 'Area'])
+            ->get()
             ->map(function ($ads) use ($lang, $user) {
                 if ($lang == 'ar') {
                     $ads->address = $ads->City->title_ar . ' , ' . $ads->Area->title_ar;
