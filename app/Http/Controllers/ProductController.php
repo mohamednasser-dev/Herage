@@ -249,7 +249,7 @@ class ProductController extends Controller
             ->where('publish', 'Y')
             ->where('deleted', 0)
             ->with('Publisher')
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id')
+            ->select('id','title','main_image','user_id','price','description','created_at','city_id','area_id')
             ->limit(3)
             ->get()->makeHidden(['City', 'Area'])
             ->map(function ($ads) use ($lang, $user) {
