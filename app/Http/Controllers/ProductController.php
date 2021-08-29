@@ -249,10 +249,11 @@ class ProductController extends Controller
             ->where('publish', 'Y')
             ->where('deleted', 0)
             ->with('Publisher')
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id')
+            ->select('id','title','main_image','user_id','price','description','created_at','city_id','area_id')
             ->limit(3)
-            ->get()->makeHidden(['City', 'Area'])
+            ->get()
             ->map(function ($ads) use ($lang, $user) {
+                $ads->price = number_format((float)($ads->price), 3);
                 if ($lang == 'ar') {
                     $ads->address = $ads->City->title_ar . ' , ' . $ads->Area->title_ar;
                 } else {
@@ -275,7 +276,7 @@ class ProductController extends Controller
                     $ads->favorite = false;
                     $ads->conversation_id = 0;
                 }
-
+                $ads->time = APIHelpers::get_month_day( $ads->created_at , $lang);
                 return $ads;
             });
 
@@ -288,11 +289,13 @@ class ProductController extends Controller
     {
         $products = Product::where('offer', 1)->select('id', 'title', 'price', 'type', 'publication_date as date')->orderBy('publication_date', 'DESC')->where('status', 1)->where('deleted', 0)->where('publish', 'Y')->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $date = date_create($products[$i]['date']);
             $products[$i]['date'] = date_format($date, 'd M Y');
             $products[$i]['image'] = ProductImage::where('product_id', $products[$i]['id'])->select('image')->first()['image'];
             $user = auth()->user();
             if ($user) {
+
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
                 if ($favorite) {
                     $products[$i]['favorite'] = true;
