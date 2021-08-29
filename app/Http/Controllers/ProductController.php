@@ -382,7 +382,7 @@ class ProductController extends Controller
             ->where('deleted', 0)
             ->get()->count();
 
-        $products = Product::select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+        $products = Product::select('id','title','main_image','user_id','price','description','created_at','city_id','area_id')
             ->where('user_id', $id)
             ->where('status', 1)
             ->where('publish', 'Y')
@@ -420,6 +420,8 @@ class ProductController extends Controller
                 $products[$i]['favorite'] = false;
                 $products[$i]['conversation_id'] = 0;
             }
+
+            $products[$i]['time'] = APIHelpers::get_month_day( $products[$i]['created_at'] , $lang);
         }
 
         $response = APIHelpers::createApiResponse(false, 200, '', '', array('basic_info'=>$basic_info ,'ads'=>$products), $request->lang);
