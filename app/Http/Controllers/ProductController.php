@@ -423,6 +423,7 @@ class ProductController extends Controller
                 $products[$i]['favorite'] = false;
                 $products[$i]['conversation_id'] = 0;
             }
+            $products[$i]['price']  = number_format((float)(  $products[$i]['price']  ), 3);
 
             $products[$i]['time'] = APIHelpers::get_month_day( $products[$i]['created_at'] , $lang);
         }
