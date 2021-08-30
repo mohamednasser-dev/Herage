@@ -386,6 +386,7 @@ class ProductController extends Controller
             ->get()->count();
 
         $products = Product::select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+            ->with('Publisher')
             ->where('user_id', $id)
             ->where('status', 1)
             ->where('publish', 'Y')
