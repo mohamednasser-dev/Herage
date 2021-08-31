@@ -665,7 +665,7 @@ class UserController extends Controller
         } else {
             $data['personal_data']->address = "";
         }
-        $products = Product::with('City')->with('Area')->where('status', 2)
+        $products = Product::with('City')->with('Area')->with('Publisher')->where('status', 2)
             ->where('deleted', 0)
             ->where('user_id', auth()->user()->id)
             ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id','retweet')
