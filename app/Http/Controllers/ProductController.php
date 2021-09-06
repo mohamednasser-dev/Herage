@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\ContactUs;
 use App\Conversation;
+use App\Category_option;
 use App\Models\Student;
 use App\Participant;
 use App\Product_comment;
@@ -437,14 +438,16 @@ class ProductController extends Controller
     public function getsearch(Request $request)
     {
         $lang = $request->lang;
+        Session::put('api_lang', $lang);
         $validator = Validator::make($request->all(), [
             'search' => 'required'
         ]);
         $search = $request->search;
-        $products = Product::where('publish', 'Y')
+        $products = Product::select('id','title','main_image','user_id','price','description','created_at','city_id','area_id')
+            ->with('Publisher')
+            ->where('publish', 'Y')
             ->where('deleted', 0)
             ->where('status', 1)
-            ->select('id', 'title', 'price', 'main_image as image', 'created_at', 'pin')
             ->Where(function ($query) use ($search) {
                 $query->Where('title', 'like', '%' . $search . '%');
             })
@@ -452,8 +455,12 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
-            $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
-            $products[$i]['views'] = $views;
+            if($lang == 'ar'){
+                $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
+            }else{
+                $products[$i]['address'] = $products[$i]['City']->title_en .' , '.$products[$i]['Area']->title_en;
+            }
+            $products[$i]['price']  = number_format((float)(  $products[$i]['price'] ), 3);
             $user = auth()->user();
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
@@ -462,8 +469,16 @@ class ProductController extends Controller
                 } else {
                     $products[$i]['favorite'] = false;
                 }
+
+                $conversation = Participant::where('ad_product_id', $products[$i]['product_id'])->where('user_id', $user->id)->first();
+                if ($conversation == null) {
+                    $products[$i]['conversation_id'] = 0;
+                } else {
+                    $products[$i]['conversation_id'] = $conversation->conversation_id;
+                }
             } else {
                 $products[$i]['favorite'] = false;
+                $products[$i]['conversation_id'] = 0;
             }
             $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
         }
@@ -1295,7 +1310,8 @@ class ProductController extends Controller
 
     public function select_ad_data(Request $request, $id)
     {
-        Session::put('local_api', $request->lang);
+        $lang = $request->lang ;
+        Session::put('local_api', $lang);
         $data['ad'] = Product::where('id', $id)
             ->with('City_api')
             ->with('Area_api')
@@ -1410,7 +1426,39 @@ class ProductController extends Controller
             }
         }
 
-        $data['features'] = $features;
+        $data['options'] = Category_option::where('cat_id', $data['ad']->category_id)->where('cat_type', 'category')->where('deleted', '0')->select('id as option_id', 'title_' . $lang . ' as title', 'is_required')->get();
+
+        if (count($data['options']) > 0) {
+            for ($i = 0; $i < count($data['options']); $i++) {
+                $option_id = $data['options'][$i]['option_id'];
+                $data['options'][$i]['type'] = 'input';
+                $optionValues = Category_option_value::where('option_id', $data['options'][$i]['option_id'])
+                    ->where('deleted', '0')->select('id as value_id', 'value_' . $lang . ' as value')
+                    ->get()->map(function ($data) use ($id, $option_id) {
+                        $data->selected = false;
+//                        dd($data->option_id);
+                        $inserted_in_db = Product_feature::where('option_id', $option_id)->where('product_id', $id)->first();
+                        if ($inserted_in_db) {
+                            if ($data->value_id == $inserted_in_db->target_id) {
+                                $data->selected = true;
+                            }
+                        }
+
+                        return $data;
+                    });
+                if (count($optionValues) > 0) {
+                    $data['options'][$i]['type'] = 'select';
+                    $data['options'][$i]['values'] = $optionValues;
+                } else {
+                    $inserted_in_db = Product_feature::where('option_id', $option_id)->where('product_id', $id)->first();
+                    if ($inserted_in_db) {
+                        $data['options'][$i]['value'] = $inserted_in_db->target_id;
+                    } else {
+                        $data['options'][$i]['value'] = "";
+                    }
+                }
+            }
+        }
         $response = APIHelpers::createApiResponse(false, 200, 'data shown', 'تم أظهار البيانات', $data, $request->lang);
         return response()->json($response, 200);
     }
