@@ -113,11 +113,11 @@ class HomeController extends Controller
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12)->makeHidden(['City','Area']);
         for ($i = 0; $i < count($products); $i++) {
-                if($lang == 'ar'){
-                    $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
-                }else{
-                    $products[$i]['address'] = $products[$i]['City']->title_en .' , '.$products[$i]['Area']->title_en;
-                }
+            if ($lang == 'ar') {
+                $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
+            } else {
+                $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
+            }
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
                 if ($favorite) {

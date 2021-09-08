@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Participant;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use App\Category_option_value;
 use Illuminate\Http\Request;
@@ -72,6 +73,7 @@ class CategoryController extends Controller
     public function getAdSubCategories(Request $request)
     {
         $lang = $request->lang;
+        Session::put('api_lang', $lang);
         $data['sub_categories'] = SubCategory::where(function ($q) {
             $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
                 $qq->has('Products_custom', '>', 0);
@@ -120,10 +122,15 @@ class CategoryController extends Controller
         array_unshift($data['sub_categories']);
 
         $lang = $request->lang;
-        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)
-            ->where('category_id', $request->category_id)->select('id', 'title', 'price', 'main_image as image', 'created_at', 'pin')
-            ->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
+        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->with('Publisher')
+            ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+            ->orderBy('created_at', 'desc')->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
+            if($lang == 'ar'){
+                $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
+            }else{
+                $products[$i]['address'] = $products[$i]['City']->title_en .' , '.$products[$i]['Area']->title_en;
+            }
             $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
@@ -157,6 +164,7 @@ class CategoryController extends Controller
     public function get_sub_categories_level2(Request $request)
     {
         $lang = $request->lang;
+        Session::put('api_lang', $lang);
         $validator = Validator::make($request->all(), [
             'category_id' => 'required'
         ]);
@@ -251,11 +259,20 @@ class CategoryController extends Controller
         $lang = $request->lang;
         array_unshift($data['sub_categories']);
         if ($request->sub_category_id == 0) {
-            $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('category_id', $request->category_id)->select('id', 'title', 'price', 'main_image as image', 'created_at', 'pin')->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
+            $products = Product::where('status', 1)->with('Publisher')->where('publish', 'Y')->where('deleted', 0)
+                ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+                ->orderBy('created_at', 'desc')->simplePaginate(12);
         } else {
-            $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('sub_category_id', $request->sub_category_id)->select('id', 'title', 'price', 'main_image as image', 'created_at', 'pin')->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
+            $products = Product::where('status', 1)->with('Publisher')->where('publish', 'Y')->where('deleted', 0)
+                ->where('sub_category_id', $request->sub_category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+                ->orderBy('created_at', 'desc')->simplePaginate(12);
         }
         for ($i = 0; $i < count($products); $i++) {
+            if($lang == 'ar'){
+                $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
+            }else{
+                $products[$i]['address'] = $products[$i]['City']->title_en .' , '.$products[$i]['Area']->title_en;
+            }
             $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
@@ -289,6 +306,7 @@ class CategoryController extends Controller
     public function get_sub_categories_level3(Request $request)
     {
         $lang = $request->lang;
+        Session::put('api_lang', $lang);
         $validator = Validator::make($request->all(), [
             'category_id' => 'required'
         ]);
@@ -455,7 +473,8 @@ class CategoryController extends Controller
         }
 
         array_unshift($data['sub_categories']);
-        $products = Product::where('status', 1)->where('deleted', 0)->where('publish', 'Y')->where('category_id', $request->category_id)->select('id', 'title', 'price', 'main_image as image', 'pin', 'created_at');
+        $products = Product::where('status', 1)->where('deleted', 0)->where('publish', 'Y')->with('Publisher')
+            ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id');
         if ($request->sub_category_id != 0) {
             $products = $products->where('sub_category_two_id', $request->sub_category_id);
         }
@@ -464,9 +483,14 @@ class CategoryController extends Controller
             $products = $products->where('sub_category_id', $request->sub_category_level1_id);
         }
 
-        $products = $products->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
+        $products = $products->orderBy('created_at', 'desc')->simplePaginate(12);
 
         for ($i = 0; $i < count($products); $i++) {
+            if ($lang == 'ar') {
+                $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
+            } else {
+                $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
+            }
             $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
@@ -500,6 +524,7 @@ class CategoryController extends Controller
     public function get_sub_categories_level4(Request $request)
     {
         $lang = $request->lang;
+        Session::put('api_lang', $lang);
         $validator = Validator::make($request->all(), [
             'category_id' => 'required'
         ]);
@@ -626,7 +651,7 @@ class CategoryController extends Controller
             }
         }
 
-        $products = Product::where('status', 1)->where('deleted', 0)->where('publish', 'Y');
+        $products = Product::where('status', 1)->where('deleted', 0)->where('publish', 'Y')->with('Publisher');
         if ($request->sub_category_id != 0) {
             $products = $products->where('sub_category_three_id', $request->sub_category_id);
 
@@ -640,8 +665,14 @@ class CategoryController extends Controller
             $products = $products->where('sub_category_id', $request->sub_category_level1_id);
         }
 
-        $products = $products->select('id', 'title', 'price', 'main_image as image', 'pin', 'created_at')->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
+        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+            ->orderBy('created_at', 'desc')->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
+            if ($lang == 'ar') {
+                $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
+            } else {
+                $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
+            }
             $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
@@ -675,6 +706,7 @@ class CategoryController extends Controller
     public function get_sub_categories_level5(Request $request)
     {
         $lang = $request->lang;
+        Session::put('api_lang', $lang);
         $validator = Validator::make($request->all(), [
             'category_id' => 'required'
         ]);
@@ -759,7 +791,7 @@ class CategoryController extends Controller
             }
         }
 
-        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0);
+        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->with('Publisher');
         if ($request->sub_category_id != 0) {
             $products = $products->where('sub_category_four_id', $request->sub_category_id);
         }
@@ -772,8 +804,14 @@ class CategoryController extends Controller
         if ($request->sub_category_level1_id != 0) {
             $products = $products->where('sub_category_id', $request->sub_category_level1_id);
         }
-        $products = $products->select('id', 'title', 'price', 'main_image as image', 'pin', 'created_at')->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
+        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+            ->orderBy('created_at', 'desc')->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
+            if ($lang == 'ar') {
+                $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
+            } else {
+                $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
+            }
             $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
@@ -807,6 +845,7 @@ class CategoryController extends Controller
     public function getproducts(Request $request)
     {
         $lang = $request->lang;
+        Session::put('api_lang', $lang);
         $validator = Validator::make($request->all(), [
             'sub_category_level1_id' => 'required',
             'sub_category_level2_id' => 'required',
@@ -856,7 +895,7 @@ class CategoryController extends Controller
             })->where('deleted', '0')->where('sub_category_id', $request->sub_category_level4_id)->select('id', 'image', 'title_' . $lang . ' as title')->orderBy('sort', 'asc')->get()->toArray();
         }
 
-        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0);
+        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->with('Publisher');
         if ($request->sub_category_level1_id != 0) {
             $products = $products->where('sub_category_id', $request->sub_category_level1_id);
         }
@@ -869,8 +908,15 @@ class CategoryController extends Controller
         if ($request->sub_category_level4_id != 0) {
             $products = $products->where('sub_category_four_id', $request->sub_category_level4_id);
         }
-        $products = $products->where('sub_category_five_id', $request->sub_category_id)->select('id', 'title', 'price', 'main_image as image', 'pin', 'created_at')->where('publish', 'Y')->orderBy('pin', 'DESC')->orderBy('created_at', 'desc')->simplePaginate(12);
+        $products = $products->where('sub_category_five_id', $request->sub_category_id)
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+            ->where('publish', 'Y')->orderBy('created_at', 'desc')->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
+            if ($lang == 'ar') {
+                $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
+            } else {
+                $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
+            }
             $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
