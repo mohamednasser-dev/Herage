@@ -44,7 +44,7 @@ class CategoryController extends Controller
                 $categories[$i]['next_level'] = true;
             }
 
-
+/*
             if ($categories[$i]['next_level'] == true) {
                 // check after this level layers
                 $data_ids = SubCategory::where('deleted', '0')->where('category_id', $categories[$i]['id'])->select('id')->get()->toArray();
@@ -62,6 +62,7 @@ class CategoryController extends Controller
                 }
                 //End check
             }
+            */
         }
 
         // $data = Categories_ad::select('image','ad_type','content as link')->where('type','category')->inRandomOrder()->take(1)->get();
@@ -100,7 +101,7 @@ class CategoryController extends Controller
                 $data['sub_categories'][$i]['next_level'] = false;
             }
 
-
+/*
             if ($data['sub_categories'][$i]['next_level'] == true) {
                 // check after this level layers
                 $data['sub_next_categories'] = SubTwoCategory::where(function ($q) {
@@ -118,6 +119,7 @@ class CategoryController extends Controller
                 }
                 //End check
             }
+*/
         }
         array_unshift($data['sub_categories']);
 
@@ -233,6 +235,7 @@ class CategoryController extends Controller
                 } else {
                     $data['sub_categories'][$i]['next_level'] = false;
                 }
+                /*
                 if ($data['sub_categories'][$i]['next_level'] == true) {
                     // check after this level layers
                     $data['sub_next_categories'] = SubThreeCategory::where('deleted', 0)->where('sub_category_id', $data['sub_categories'][$i]['id'])->select('id', 'image', 'title_' . $lang . ' as title')->orderBy('sort', 'asc')->get()->toArray();
@@ -254,6 +257,7 @@ class CategoryController extends Controller
                     }
                     //End check
                 }
+                */
             }
         }
         $lang = $request->lang;
@@ -387,6 +391,7 @@ class CategoryController extends Controller
                 if (isset($subThreeCats['id'])) {
                     $data['sub_categories'][$i]['next_level'] = true;
                 }
+                /*
                 if ($data['sub_categories'][$i]['next_level'] == true) {
                     // check after this level layers
                     $data['sub_next_categories'] = SubFourCategory::where('deleted', 0)->where('sub_category_id', $data['sub_categories'][$i]['id'])->select('id', 'image', 'title_' . $lang . ' as title')->orderBy('sort', 'asc')->get()->toArray();
@@ -408,6 +413,7 @@ class CategoryController extends Controller
                     }
                     //End check
                 }
+                */
                 if ($All_sub_cat == false) {
                     if ($data['sub_categories'][$i]['next_level'] == false) {
                         $All_sub_cat = false;
@@ -607,6 +613,7 @@ class CategoryController extends Controller
             if (isset($subThreeCats['id'])) {
                 $data['sub_categories'][$i]['next_level'] = true;
             }
+            /*
             if ($data['sub_categories'][$i]['next_level'] == true) {
                 // check after this level layers
                 $data['sub_next_categories'] = SubFiveCategory::where('deleted', '0')->where('sub_category_id', $subThreeCats->id)->select('id', 'image', 'title_' . $lang . ' as title')->orderBy('sort', 'asc')->get()->toArray();
@@ -628,6 +635,7 @@ class CategoryController extends Controller
                 }
                 //End check
             }
+            */
 
 
         }
