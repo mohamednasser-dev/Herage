@@ -492,6 +492,20 @@ class ProductController extends Controller
     {
         $lang = $request->lang;
         Session::put('api_lang', $lang);
+
+        $categories = SubCategory::select('id','title_'. $lang .' as title')->where('deleted',0)->where('category_id',7)->get()->toArray();
+
+
+        //to add all button
+        $title = 'All';
+        if ($request->lang == 'ar') {
+            $title = 'الكل';
+        }
+        $all = new \StdClass;
+        $all->id = 0;
+        $all->title = $title;
+        array_unshift($categories, $all);
+
         $products = Product::where('publish', 'Y')->with('Publisher')->with('Sub_category')
             ->where('deleted', 0)
             ->where('status', 1)
@@ -521,7 +535,7 @@ class ProductController extends Controller
             }
             $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
         }
-        $response = APIHelpers::createApiResponse(false, 200, '', '', $products, $request->lang);
+        $response = APIHelpers::createApiResponse(false, 200, '', '',array('categories'=>$categories , 'products'=>$products ) , $request->lang);
         return response()->json($response, 200);
 
     }
