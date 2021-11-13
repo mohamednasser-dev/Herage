@@ -34,6 +34,10 @@ class User extends Authenticatable implements JWTSubject
       ];
     use Notifiable;
 
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+    ];
+
     // Rest omitted for brevity
 
     /**
