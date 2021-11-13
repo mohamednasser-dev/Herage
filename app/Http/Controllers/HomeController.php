@@ -70,7 +70,7 @@ class HomeController extends Controller
             $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
                 $qq->has('Products', '>', 0);
             });
-        })->where('deleted', 0)->select('id', 'title_' . $lang . ' as title', 'image')->orderBy('sort', 'asc')->get();
+        })->where('deleted', 0)->select('id', 'title_' . $lang . ' as title', 'image')->orderBy('sort', 'asc')->get()->toArray();
 
         for ($i = 0; $i < count($categories); $i++) {
             $cat_ids[$i] = $categories[$i]['id'];
@@ -102,6 +102,19 @@ class HomeController extends Controller
                 //End check
             }
         }
+        //to add all button
+        $title = 'main';
+        if ($request->lang == 'ar') {
+            $title = 'الرئيسية';
+        }
+        $all = new \StdClass;
+        $all->id = 0;
+        $all->title = $title;
+        $all->image = "";
+        $all->products_count = 0;
+        $all->next_level = false;
+        array_unshift($categories, $all);
+        //end all button
 
         $data['categories'] = $categories;
         $products = Product::where('status', 1)
