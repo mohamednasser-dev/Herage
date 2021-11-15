@@ -1180,7 +1180,7 @@ class ProductController extends Controller
             ->select('product_id', 'user_id')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
-
+        $products = $products->unique('product_id');
         for ($i = 0; $i < count($products); $i++) {
             if($lang == 'ar'){
                 $products[$i]['Product']->address = $products[$i]['Product']->City->title_ar .' , '.$products[$i]['Product']->Area->title_ar;
@@ -1557,6 +1557,9 @@ class ProductController extends Controller
                 $input['main_image'] = $image_new_name;
             }
             if ($request->images != null) {
+                if($request->ios == 'ios'){
+                    ProductImage::where('product_id',$id)->delete();
+                }
                 foreach ($request->images as $image) {
                     Cloudder::upload("data:image/jpeg;base64," . $image, null);
                     $imagereturned = Cloudder::getResult();
