@@ -1573,6 +1573,7 @@ class ProductController extends Controller
             }
             unset($input['images']);
             unset($input['options']);
+            unset($input['ios']);
             $updated = Product::where('id', $id)->update($input);
             if ($request->options != null) {
                 Product_feature::where('product_id', $id)->delete();
