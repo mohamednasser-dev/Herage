@@ -645,7 +645,7 @@ class UserController extends Controller
         Session::put('api_lang', $lang);
         $data['personal_data'] = User::with('City')->with('Area')->with('Account_type')
             ->where('id', $user->id)
-            ->select('name', 'email', 'about_user', 'image', 'cover', 'phone', 'watsapp', 'city_id', 'area_id', 'account_type', 'created_at')
+            ->select('id','name', 'email', 'about_user', 'image', 'cover', 'phone', 'watsapp', 'city_id', 'area_id', 'account_type', 'created_at')
             ->first();
 
         $user_specialties = User_specialty::with('Specialty')
