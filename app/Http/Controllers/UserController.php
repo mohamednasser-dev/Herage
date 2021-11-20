@@ -660,6 +660,7 @@ class UserController extends Controller
             }
         }
         $data['personal_data']->specialties = $spec;
+        $data['personal_data']->specialties_ids = $user_specialties;
         if ($data['personal_data']->city_id != null && $data['personal_data']->area_id != null) {
             $data['personal_data']->address = $data['personal_data']->City->title_ar . ' , ' . $data['personal_data']->Area->title_ar;
         } else {
