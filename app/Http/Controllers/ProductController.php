@@ -181,12 +181,12 @@ class ProductController extends Controller
         }
         $user_ip_address = $request->ip();
         if ($user == null) {
-            $prod_view = Product_view::where('ip', $user_ip_address)->where('product_id', $data->id)->first();
-            if ($prod_view == null) {
-                $data_view['ip'] = $user_ip_address;
-                $data_view['product_id'] = $data->id;
-                Product_view::create($data_view);
-            }
+//            $prod_view = Product_view::where('ip', $user_ip_address)->where('product_id', $data->id)->first();
+//            if ($prod_view == null) {
+//                $data_view['ip'] = $user_ip_address;
+//                $data_view['product_id'] = $data->id;
+//                Product_view::create($data_view);
+//            }
         } else {
             $prod_view = Product_view::where('user_id', $user->id)->where('product_id', $data->id)->first();
             if ($prod_view == null) {
@@ -1180,7 +1180,8 @@ class ProductController extends Controller
             ->select('product_id', 'user_id')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
-        $products = $products->unique('product_id');
+//        $products = $products
+//            ->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
             if($lang == 'ar'){
                 $products[$i]['Product']->address = $products[$i]['Product']->City->title_ar .' , '.$products[$i]['Product']->Area->title_ar;
