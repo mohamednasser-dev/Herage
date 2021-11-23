@@ -70,10 +70,22 @@ class UserController extends Controller
     public function get_account_types(Request $request)
     {
         $lang = $request->lang;
+        $user = auth()->user();
         Session::put('api_lang', $lang);
         $data = Account_type::where('type', 'commercial')
             ->select('id', 'name_' . $lang . ' as name')
-            ->get();
+            ->get()->map(function ($data) use ($user) {
+                if ($user) {
+                    if ($user->account_type == $data->id) {
+                        $data->is_selected = true;
+                    } else {
+                        $data->is_selected = false;
+                    }
+                } else {
+                    $data->is_selected = false;
+                }
+                return $data;
+            });
         $response = APIHelpers::createApiResponse(false, 200, '', '', $data, $lang);
         return response()->json($response, 200);
     }
@@ -130,7 +142,7 @@ class UserController extends Controller
                     } else {
                         $data->is_selected = false;
                     }
-                }else{
+                } else {
                     $data->is_selected = false;
                 }
                 return $data;
@@ -190,7 +202,7 @@ class UserController extends Controller
 
     }
 
-    public function updateprofile(Request $request)
+    public function update_profile(Request $request)
     {
         $lang = $request->lang;
         Session::put('api_lang', $lang);
