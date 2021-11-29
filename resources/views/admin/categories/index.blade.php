@@ -58,9 +58,7 @@
                                 <td class="text-center"><img src="{{image_cloudinary_url()}}{{ $category->image }}"  /></td>
                                 <td>{{ app()->getLocale() == 'en' ? $category->title_en : $category->title_ar }}</td>
                                 <td class="text-center blue-color">
-                                    @if ($data['prevent_next_level'])
-                                        {{ __('messages.category_has_products_add') }}
-                                    @else
+                                    
                                     <a href="{{route('sub_cat.show',$category->id)}}">
                                         <div class="">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -72,7 +70,7 @@
                                             </svg>
                                         </div>
                                     </a>
-                                    @endif
+                                   
                                 </td>
                                 <td class="text-center blue-color">
                                     <a href="{{route('cat_options.show',$category->id)}}">

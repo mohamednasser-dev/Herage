@@ -56,9 +56,7 @@
                                 <td class="text-center"><img src="{{image_cloudinary_url()}}{{ $row->image }}"  /></td>
                                 <td class="text-center blue-color">{{ app()->getLocale() == 'en' ? $row->title_en : $row->title_ar }}</td>
                                 <td class="text-center blue-color">
-                                    @if ($prevent_next_level)
-                                        {{ __('messages.category_has_products_add') }}
-                                    @else
+                                    
                                     <a href="{{route('sub_four_cat.show',$row->id)}}">
                                         <div class="">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -70,7 +68,7 @@
                                             </svg>
                                         </div>
                                     </a>
-                                    @endif
+                                    
                                 </td>
                                 @if(Auth::user()->update_data)
                                     <td class="text-center blue-color" ><a href="{{ route( 'sub_three_cat.edit', $row->id ) }}" ><i class="far fa-edit"></i></a></td>
