@@ -56,11 +56,12 @@ class CategoryController extends Controller
             if ($subCategories && count($subCategories) > 0) {
                 $hasProducts = false;
                 for ($n = 0; $n < count($subCategories); $n++) {
-                    // if ($model != '\App\SubFiveCategory') {
+                    
+                    if ($model != '\App\SubFiveCategory') {
                         if ($subCategories[$n]->products != null && count($subCategories[$n]->products) > 0) {
                             $hasProducts = true;
                         }
-                    // }
+                    }
                 }
                 if ($hasProducts) {
                     $row->next_level = true;
@@ -460,6 +461,7 @@ class CategoryController extends Controller
 
         if ($request->sub_category_id != 0) {
             $data['sub_categories'] = $this->getCatsSubCats('\App\SubFourCategory', $lang, false, $request->sub_category_id, true);
+            
             $data['sub_category_level3'] = SubThreeCategory::where('id', $request->sub_category_id)->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->first();
             // if ($request->sub_category_level2_id == 0) {
             //     $data['sub_category_array'] = SubFourCategory::where(function ($q) {
@@ -618,16 +620,7 @@ class CategoryController extends Controller
             // }
             $data['category'] = Category::where('id', $request->category_id)->select('id', 'title_' . $lang . ' as title')->first();
         }
-        for ($i = 0; $i < count($data['sub_categories']); $i++) {
-            $cat_ids[$i] = $data['sub_categories'][$i]['id'];
-            $five_products = Product::where('sub_category_five_id', $data['sub_categories'][$i]['id'])->where('status', 1)->where('publish', 'Y')->where('deleted', 0)->first();
-//            $subFiveCats = SubFiveCategory::where('sub_category_id', $data['sub_categories'][$i]['id'])->where('deleted', '0')->select('id', 'deleted')->first();
-            $data['sub_categories'][$i]['next_level'] = false;
-            if (isset($five_products['id'])) {
-                $data['sub_categories'][$i]['next_level'] = true;
-            }
-
-        }
+        
         
 
         $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->with('Publisher');
