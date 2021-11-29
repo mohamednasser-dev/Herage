@@ -29,9 +29,7 @@ class SubFourCategory extends Model
     }
 
     public function ViewSubCategories() {
-        $dd = $this->hasMany('App\SubFiveCategory', 'sub_category_id')->where('deleted', "0");
-        
-        return $dd;
+        return $this->hasMany('App\SubFiveCategory', 'sub_category_id')->where('deleted', 0);
     }
 
     public function subCatsHasProducts() {

@@ -587,6 +587,7 @@ class CategoryController extends Controller
         }
         if ($request->sub_category_id != 0) {
             $data['sub_categories'] = $this->getCatsSubCats('\App\SubFiveCategory', $lang, false, $request->sub_category_id, true);
+        
             $data['sub_category_level4'] = SubFourCategory::where('deleted', 0)->where('sub_category_id', $request->sub_category_id)->select('id', 'image', 'title_' . $lang . ' as title')->first();
             // if ($request->sub_category_level3_id == 0) {
             //     $data['sub_category_array'] = SubFiveCategory::where(function ($q) {
