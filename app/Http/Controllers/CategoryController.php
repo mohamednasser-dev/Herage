@@ -56,11 +56,11 @@ class CategoryController extends Controller
             if ($subCategories && count($subCategories) > 0) {
                 $hasProducts = false;
                 for ($n = 0; $n < count($subCategories); $n++) {
-                    if ($model != '\App\SubFiveCategory') {
+                    // if ($model != '\App\SubFiveCategory') {
                         if ($subCategories[$n]->products != null && count($subCategories[$n]->products) > 0) {
                             $hasProducts = true;
                         }
-                    }
+                    // }
                 }
                 if ($hasProducts) {
                     $row->next_level = true;
