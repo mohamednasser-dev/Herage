@@ -59,7 +59,7 @@ class HomeController extends Controller
                 $hasProducts = false;
                 for ($n = 0; $n < count($subCategories); $n++) {
                     if ($model != '\App\SubFourCategory' || $model != '\App\SubFiveCategory') {
-                        if ($subCategories[$n]->subCatsHasProducts != null && count($subCategories[$n]->subCatsHasProducts) > 0) {
+                        if ($subCategories[$n]->products != null && count($subCategories[$n]->products) > 0) {
                             $hasProducts = true;
                         }
                     }
