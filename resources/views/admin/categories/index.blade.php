@@ -58,7 +58,7 @@
                                 <td class="text-center"><img src="{{image_cloudinary_url()}}{{ $category->image }}"  /></td>
                                 <td>{{ app()->getLocale() == 'en' ? $category->title_en : $category->title_ar }}</td>
                                 <td class="text-center blue-color">
-                                    @if (($data['prevent_next_level']  && count($category->products) > 0 && count($category->ViewSubCategories) == 0) || ($data['prevent_next_level']  && count($category->products) == 0))
+                                    @if ($data['prevent_next_level'])
                                         {{ __('messages.category_has_products_add') }}
                                     @else
                                     <a href="{{route('sub_cat.show',$category->id)}}">
