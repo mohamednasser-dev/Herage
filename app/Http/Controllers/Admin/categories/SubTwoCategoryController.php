@@ -43,7 +43,33 @@ class SubTwoCategoryController extends AdminController
     {
         $cat_id = $id;
         $data = SubTwoCategory::where('sub_category_id',$id)->where('deleted','0')->orderBy('sort' , 'asc')->get();
-        return view('admin.categories.sub_category.sub_two_category.index',compact('data','cat_id'));
+        $prevent_next_level = false;
+        if ($data && count($data) > 0) {
+            foreach($data as $row) {
+                $row->next_level = false;
+            
+                if (count($row->ViewSubCategories) > 0) {
+                    $hasProducts = false;
+                    for ($i = 0; $i < count($row->ViewSubCategories); $i ++) {
+                        if (count($row->ViewSubCategories[$i]->products) > 0) {
+                            $hasProducts = true;
+                        }
+                    }
+
+                    if ($hasProducts) {
+                        $row->next_level = true;
+                    }
+                    
+                }
+
+                if (count($row->products) > 0 && $row->next_level == false) {
+                    $prevent_next_level = true;
+                    break;
+                }
+            }
+        }
+        
+        return view('admin.categories.sub_category.sub_two_category.index',compact('data','cat_id', 'prevent_next_level'));
     }
 
     // sorting
