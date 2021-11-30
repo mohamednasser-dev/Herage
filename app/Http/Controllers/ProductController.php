@@ -672,7 +672,7 @@ class ProductController extends Controller
             'category_id' => 'required',
             'sub_category_id' => '',
             'title' => 'required',
-            'main_image' => 'required',
+            // 'main_image' => 'required',
             'images' => '',
             'city_id' => 'required|exists:cities,id',
             'area_id' => 'required|exists:areas,id',
@@ -693,14 +693,17 @@ class ProductController extends Controller
                 $today = Carbon::parse($mytime->toDateTimeString())->format('Y-m-d H:i');
                 $input['publish'] = 'Y';
                 $input['publication_date'] = $today;
-                //save second step of creation ...
-                $image = $request->main_image;
-                Cloudder::upload("data:image/jpeg;base64," . $image, null);
-                $imagereturned = Cloudder::getResult();
-                $image_id = $imagereturned['public_id'];
-                $image_format = $imagereturned['format'];
-                $image_new_name = $image_id . '.' . $image_format;
-                $input['main_image'] = $image_new_name;
+                if ($request->main_image) {
+                    //save second step of creation ...
+                    $image = $request->main_image;
+                    Cloudder::upload("data:image/jpeg;base64," . $image, null);
+                    $imagereturned = Cloudder::getResult();
+                    $image_id = $imagereturned['public_id'];
+                    $image_format = $imagereturned['format'];
+                    $image_new_name = $image_id . '.' . $image_format;
+                    $input['main_image'] = $image_new_name;
+                }
+                
                 //create final
                 if ($input['price'] == null) {
                     $input['price'] = '0';
