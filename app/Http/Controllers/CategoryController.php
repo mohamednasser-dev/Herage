@@ -246,7 +246,7 @@ class CategoryController extends Controller
             $data['sub_category_level1'] = (object)[
                 "id" => 0,
                 "title" => "All",
-                "category_id" => $request->category_id
+                "category_id" => (int)$request->category_id
             ];
             // $data['sub_category_array'] = $this->getCatsSubCats('\App\SubTwoCategory', $lang, false, 0, false, $pluckSubCats);
             // if (count($data['sub_category_array']) == 0) {
@@ -352,7 +352,7 @@ class CategoryController extends Controller
             $data['sub_category_level2'] = (object)[
                 "id" => 0,
                 "title" => "All",
-                "sub_category_id" => $request->sub_category_level1_id
+                "sub_category_id" => (int)$request->sub_category_level1_id
             ];
             // if ($request->sub_category_level1_id != 0) {
             //     $data['sub_category_array'] = SubThreeCategory::where(function ($q) {
@@ -485,7 +485,7 @@ class CategoryController extends Controller
             $data['sub_category_level3'] = (object)[
                 "id" => 0,
                 "title" => "All",
-                "sub_category_id" => $request->sub_category_level2_id
+                "sub_category_id" => (int)$request->sub_category_level2_id
             ];
             // if ($request->sub_category_level2_id == 0) {
             //     $data['sub_category_array'] = SubFourCategory::where(function ($q) {
@@ -606,7 +606,7 @@ class CategoryController extends Controller
             $data['sub_category_level3'] = (object)[
                 "id" => 0,
                 "title" => "All",
-                "sub_category_id" => $request->sub_category_level2_id
+                "sub_category_id" => (int)$request->sub_category_level2_id
             ];
             // if ($request->sub_category_level3_id == 0) {
             //     $data['sub_category_array'] = SubFiveCategory::where(function ($q) {
