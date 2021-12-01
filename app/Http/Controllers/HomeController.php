@@ -151,9 +151,9 @@ class HomeController extends Controller
             
         for ($i = 0; $i < count($products); $i++) {
             if ($lang == 'ar') {
-                $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
+                $products[$i]['address'] = $products[$i]['City']->title_ar;
             } else {
-                $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
+                $products[$i]['address'] = $products[$i]['City']->title_en;
             }
             $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             if ($user) {
