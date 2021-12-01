@@ -271,10 +271,11 @@ class CategoryController extends Controller
                 ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
                 ->orderBy('created_at', 'desc')->simplePaginate(12);
         } else {
-            $products = Product::where('status', 1)->with('Publisher')->where('publish', 'Y')->where('deleted', 0)
-                ->where('sub_category_id', $request->sub_category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+            $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('sub_category_id', $request->sub_category_id)->with('Publisher')
+                ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
                 ->orderBy('created_at', 'desc')->simplePaginate(12);
         }
+        
         for ($i = 0; $i < count($products); $i++) {
             if($lang == 'ar'){
                 $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;

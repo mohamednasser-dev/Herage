@@ -144,10 +144,11 @@ class HomeController extends Controller
             ->with('Publisher')
             ->where('publish', 'Y')
             ->where('deleted', 0)
-            ->whereIn('category_id', $cat_ids)
+            // ->whereIn('category_id', $cat_ids)
             ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
             ->orderBy('created_at', 'desc')
-            ->simplePaginate(12)->makeHidden(['City','Area']);
+            ->get()->makeHidden(['City','Area']);
+            
         for ($i = 0; $i < count($products); $i++) {
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
@@ -176,8 +177,9 @@ class HomeController extends Controller
         }
 
         $new_ad = [];
+        
         for ($i = 0; $i < count($products); $i++) {
-
+            array_push($new_ad , $products[$i]);
             if ((($i+1) % 2) == 0) {
                 $ad = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->inRandomOrder()->first();
                 if($ad){
@@ -192,11 +194,8 @@ class HomeController extends Controller
                     $ad->conversation_id =0;
                     $ad->time ="";
                     $ad->publisher = (object)[];
-                    array_push($new_ad , $products[$i]);
                     array_push($new_ad , $ad);
                 }
-            }else{
-                array_push($new_ad , $products[$i]);
             }
         }
         $data['products'] = $new_ad;
