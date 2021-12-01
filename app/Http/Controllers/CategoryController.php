@@ -174,7 +174,7 @@ class CategoryController extends Controller
         if ($request->category_id != 0) {
             $products = $products->where('category_id', $request->category_id);
         }
-        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
         ->orderBy('created_at', 'desc')->simplePaginate(12);
             
         for ($i = 0; $i < count($products); $i++) {
@@ -183,7 +183,8 @@ class CategoryController extends Controller
             }else{
                 $products[$i]['address'] = $products[$i]['City']->title_en .' , '.$products[$i]['Area']->title_en;
             }
-            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
+            
+            $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
@@ -268,11 +269,11 @@ class CategoryController extends Controller
        
         if ($request->sub_category_id == 0) {
             $products = Product::where('status', 1)->with('Publisher')->where('publish', 'Y')->where('deleted', 0)
-                ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+                ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
                 ->orderBy('created_at', 'desc')->simplePaginate(12);
         } else {
             $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('sub_category_id', $request->sub_category_id)->with('Publisher')
-                ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+                ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
                 ->orderBy('created_at', 'desc')->simplePaginate(12);
         }
         
@@ -282,7 +283,7 @@ class CategoryController extends Controller
             }else{
                 $products[$i]['address'] = $products[$i]['City']->title_en .' , '.$products[$i]['Area']->title_en;
             }
-            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
@@ -386,7 +387,7 @@ class CategoryController extends Controller
         
         //end all button
         $products = Product::where('status', 1)->where('deleted', 0)->where('publish', 'Y')->with('Publisher')
-            ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id');
+            ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price');
         if ($request->sub_category_id != 0) {
             $products = $products->where('sub_category_two_id', $request->sub_category_id);
         }
@@ -403,7 +404,7 @@ class CategoryController extends Controller
             } else {
                 $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
             }
-            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
@@ -521,7 +522,7 @@ class CategoryController extends Controller
             $products = $products->where('sub_category_id', $request->sub_category_level1_id);
         }
 
-        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
             ->orderBy('created_at', 'desc')->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
             if ($lang == 'ar') {
@@ -529,7 +530,7 @@ class CategoryController extends Controller
             } else {
                 $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
             }
-            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
@@ -638,7 +639,7 @@ class CategoryController extends Controller
         if ($request->sub_category_level1_id != 0) {
             $products = $products->where('sub_category_id', $request->sub_category_level1_id);
         }
-        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
             ->orderBy('created_at', 'desc')->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
             if ($lang == 'ar') {
@@ -646,7 +647,7 @@ class CategoryController extends Controller
             } else {
                 $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
             }
-            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();

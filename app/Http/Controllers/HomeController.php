@@ -144,8 +144,8 @@ class HomeController extends Controller
             ->with('Publisher')
             ->where('publish', 'Y')
             ->where('deleted', 0)
-            // ->whereIn('category_id', $cat_ids)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+            ->whereIn('category_id', $cat_ids)
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
             ->orderBy('created_at', 'desc')
             ->get()->makeHidden(['City','Area']);
             
@@ -155,6 +155,7 @@ class HomeController extends Controller
             } else {
                 $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
             }
+            $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
                 if ($favorite) {
@@ -189,6 +190,7 @@ class HomeController extends Controller
                     $ad->created_at = Carbon::now();
                     $ad->city_id = 0;
                     $ad->area_id = 0;
+                    $ad->price = '0';
                     $ad->address = $ad->type;
                     $ad->favorite =false;
                     $ad->conversation_id =0;
