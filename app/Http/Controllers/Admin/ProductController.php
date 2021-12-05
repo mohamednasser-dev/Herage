@@ -367,6 +367,7 @@ class ProductController extends AdminController
     public function details($product_id)
     {
         $data = Product::where('id', $product_id)->first();
+        
         return view('admin.products.product_details', compact('data'));
     }
 

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class City extends Model
 {
-
+    protected $fillable = ['image', 'title_ar', 'title_en', 'deleted'];
 
     public function Areas()
     {

@@ -34,6 +34,63 @@ class HomeController extends Controller
         //        --------------------------------------------- end scheduled functions --------------------------------------------------------
     }
 
+    // get cats - sub cats with next level
+    public function getCatsSubCats($model, $lang, $show=true, $cat_id=0, $all=false, $whereIn=[]) {
+        $categories = $model::has('Products', '>', 0)
+        ->where('deleted', 0);
+        if ($model == '\App\SubCategory' && $cat_id != 0) {
+            $categories = $categories->where('category_id', $cat_id);
+        }elseif ($model != '\App\Category' && $cat_id != 0) {
+            $categories = $categories->where('sub_category_id', $cat_id);
+        }
+        if (count($whereIn) > 0) {
+            $categories = $categories->whereIn('sub_category_id', $whereIn);
+        }
+        
+        $categories = $categories->select('id', 'title_' . $lang . ' as title', 'image')->orderBy('sort', 'asc')->get()->makeHidden(['ViewSubCategories', 'products'])
+        ->map(function ($row) use ($show, $model) {
+            if ($show) {
+                $row->products_count = count($row->products);
+            }
+            $row->next_level = false;
+            $subCategories = $row->ViewSubCategories;
+            
+            if ($subCategories && count($subCategories) > 0) {
+                $hasProducts = false;
+                for ($n = 0; $n < count($subCategories); $n++) {
+                    if ($model != '\App\SubFourCategory' || $model != '\App\SubFiveCategory') {
+                        if ($subCategories[$n]->products != null && count($subCategories[$n]->products) > 0) {
+                            $hasProducts = true;
+                        }
+                    }
+                }
+                if ($hasProducts) {
+                    $row->next_level = true;
+                }
+            }
+            $row->selected = false;
+            return $row;
+        })->toArray();
+
+        if ($all) {
+            $title = 'Main';
+            if ($lang == 'ar') {
+                $title = 'الرئيسية';
+            }
+            $all = [
+                'id' => 0,
+                'image' => "",
+                'title' => $title,
+                'next_level' => false,
+                'selected' => false
+            ];
+            
+            array_unshift($categories, $all);
+        }
+
+        return $categories;
+    }
+
     public function gethome(Request $request)
     {
         $data['slider'] = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->get();
@@ -66,55 +123,21 @@ class HomeController extends Controller
         Session::put('api_lang', $lang);
         $user = auth()->user();
         $cat_ids =[];
-        $categories = Category::where(function ($q) {
-            $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-                $qq->has('Products', '>', 0);
-            });
-        })->where('deleted', 0)->select('id', 'title_' . $lang . ' as title', 'image')->orderBy('sort', 'asc')->get()->toArray();
+        $category = '\App\Category';
+        $categories = $this->getCatsSubCats($category, $lang, true, 0, true);
+        
+        // $categories = Category::where(function ($q) {
+        //     $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
+        //         $qq->has('Products', '>', 0);
+        //     });
+        // })->where('deleted', 0)->select('id', 'title_' . $lang . ' as title', 'image')->orderBy('sort', 'asc')->get()->toArray();
 
         for ($i = 0; $i < count($categories); $i++) {
-            $cat_ids[$i] = $categories[$i]['id'];
-            $categories[$i]['products_count'] = Product::where('category_id', $categories[$i]['id'])->where('status', 1)->where('publish', 'Y')->where('deleted', 0)->count();
-            //text next level
-            $subTwoCats = SubCategory::where('category_id', $categories[$i]['id'])->where('deleted', 0)->select('id')->get()->count();
-
-            if($subTwoCats > 0){
-                $categories[$i]['next_level'] = true;
-            }else{
-                $categories[$i]['next_level'] = false;
-            }
-
-            if ($categories[$i]['next_level'] == true) {
-                // check after this level layers
-                $data_ids = SubCategory::where('deleted', '0')->where('category_id', $categories[$i]['id'])->select('id')->get()->toArray();
-                $subFiveCats = SubTwoCategory::whereIn('sub_category_id', $data_ids)->where('deleted', 0)->select('id', 'deleted')->get();
-
-                if (count($subFiveCats) == 0) {
-                    $have_next_level = false;
-                } else {
-                    $have_next_level = true;
-                }
-                if ($have_next_level == false) {
-                    $categories[$i]['next_level'] = false;
-                } else {
-                    $categories[$i]['next_level'] = true;
-                }
-                //End check
+            if ($categories[$i]['id'] != 0) {
+                $cat_ids[$i] = $categories[$i]['id'];
             }
         }
-        //to add all button
-        $title = 'main';
-        if ($request->lang == 'ar') {
-            $title = 'الرئيسية';
-        }
-        $all = new \StdClass;
-        $all->id = 0;
-        $all->title = $title;
-        $all->image = "";
-        $all->products_count = 0;
-        $all->next_level = false;
-        array_unshift($categories, $all);
-        //end all button
+        
 
         $data['categories'] = $categories;
         $products = Product::where('status', 1)
@@ -122,15 +145,17 @@ class HomeController extends Controller
             ->where('publish', 'Y')
             ->where('deleted', 0)
             ->whereIn('category_id', $cat_ids)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
             ->orderBy('created_at', 'desc')
-            ->simplePaginate(12)->makeHidden(['City','Area']);
+            ->get()->makeHidden(['City','Area']);
+            
         for ($i = 0; $i < count($products); $i++) {
             if ($lang == 'ar') {
-                $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
+                $products[$i]['address'] = $products[$i]['City']->title_ar;
             } else {
-                $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
+                $products[$i]['address'] = $products[$i]['City']->title_en;
             }
+            $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
                 if ($favorite) {
@@ -153,8 +178,9 @@ class HomeController extends Controller
         }
 
         $new_ad = [];
+        
         for ($i = 0; $i < count($products); $i++) {
-
+            array_push($new_ad , $products[$i]);
             if ((($i+1) % 2) == 0) {
                 $ad = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->inRandomOrder()->first();
                 if($ad){
@@ -164,16 +190,14 @@ class HomeController extends Controller
                     $ad->created_at = Carbon::now();
                     $ad->city_id = 0;
                     $ad->area_id = 0;
+                    $ad->price = '0';
                     $ad->address = $ad->type;
                     $ad->favorite =false;
                     $ad->conversation_id =0;
                     $ad->time ="";
                     $ad->publisher = (object)[];
-                    array_push($new_ad , $products[$i]);
                     array_push($new_ad , $ad);
                 }
-            }else{
-                array_push($new_ad , $products[$i]);
             }
         }
         $data['products'] = $new_ad;

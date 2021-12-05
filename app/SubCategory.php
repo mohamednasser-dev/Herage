@@ -31,4 +31,12 @@ class SubCategory extends Model
                                     });
                                 });
     }
+
+    public function ViewSubCategories() {
+        return $this->hasMany('App\SubTwoCategory', 'sub_category_id')->where('deleted', 0);
+    }
+
+    public function subCatsHasProducts() {
+        return $this->hasMany('App\SubTwoCategory', 'sub_category_id')->where('deleted', 0)->has('products', '>', 0);
+    }
 }

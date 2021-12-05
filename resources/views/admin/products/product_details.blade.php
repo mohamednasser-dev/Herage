@@ -82,7 +82,12 @@
                             <img width="100%" src="https://res.cloudinary.com/dsrtqoxu2/image/upload/w_100,q_100/v1581928924/{{ $image->image }}"  />
                         </div>
                     @endforeach
+                    
                 </div>
+                <div style="margin-top : 20px" class="row">
+                    <iframe src="https://maps.google.com/maps?q={{ $data->latitude }}, {{ $data->longitude }}&z=15&output=embed" width="100%" height="270" frameborder="0" style="border:0"></iframe>
+                </div>
+
             </div>
         </div>
     </div>
