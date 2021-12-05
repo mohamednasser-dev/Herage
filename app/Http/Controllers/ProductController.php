@@ -497,9 +497,9 @@ class ProductController extends Controller
 
 
         for ($i = 0; $i < count($categories); $i++) {
-            if($categories[$i]['id'] == 12){
+            if($categories[$i]['id'] == 16){
                 $categories[$i]['color'] = '#87CEEB';
-            }elseif($categories[$i]['id'] == 13){
+            }elseif($categories[$i]['id'] == 17){
                 $categories[$i]['color'] = '#FFFF00';
             }else{
                 $categories[$i]['color'] = '#008000';
@@ -527,9 +527,9 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()->makeHidden(['City','Area']);
         for ($i = 0; $i < count($products); $i++) {
-            if($products[$i]['sub_category_id'] == 12){
+            if($products[$i]['sub_category_id'] == 16){
                 $products[$i]['color'] = '#87CEEB';
-            }elseif($products[$i]['sub_category_id'] == 13){
+            }elseif($products[$i]['sub_category_id'] == 17){
                 $products[$i]['color'] = '#FFFF00';
             }else{
                 $products[$i]['color'] = '#008000';
