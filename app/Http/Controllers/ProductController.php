@@ -496,6 +496,17 @@ class ProductController extends Controller
         $categories = SubCategory::select('id','title_'. $lang .' as title')->where('deleted',0)->where('category_id',7)->get()->toArray();
 
 
+        for ($i = 0; $i < count($categories); $i++) {
+            if($categories[$i]['id'] == 12){
+                $categories[$i]['color'] = '#87CEEB';
+            }elseif($categories[$i]['id'] == 13){
+                $categories[$i]['color'] = '#FFFF00';
+            }else{
+                $categories[$i]['color'] = '#008000';
+
+            }
+        }
+
         //to add all button
         $title = 'All';
         if ($request->lang == 'ar') {
@@ -504,6 +515,7 @@ class ProductController extends Controller
         $all = new \StdClass;
         $all->id = 0;
         $all->title = $title;
+        $all->color = '#008000';
         array_unshift($categories, $all);
 
         $products = Product::where('publish', 'Y')->with('Publisher')->with('Sub_category')
@@ -515,6 +527,14 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()->makeHidden(['City','Area']);
         for ($i = 0; $i < count($products); $i++) {
+            if($products[$i]['sub_category_id'] == 12){
+                $products[$i]['color'] = '#87CEEB';
+            }elseif($products[$i]['sub_category_id'] == 13){
+                $products[$i]['color'] = '#FFFF00';
+            }else{
+                $products[$i]['color'] = '#008000';
+
+            }
             if($lang == 'ar'){
                 $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
             }else{
@@ -703,7 +723,7 @@ class ProductController extends Controller
                     $image_new_name = $image_id . '.' . $image_format;
                     $input['main_image'] = $image_new_name;
                 }
-                
+
                 //create final
                 if ($input['price'] == null) {
                     $input['price'] = '0';
