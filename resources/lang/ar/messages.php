@@ -5,6 +5,7 @@ return [
 
 
 
+    'reported' => "البلاغ",
     'reports' => "البلاغات",
     'expier_days' => "عدد أيام انتهاء الاعلان",
     'specialties' => "التخصصات",

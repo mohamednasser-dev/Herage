@@ -155,7 +155,7 @@ class HomeController extends Controller
         $new_ad = [];
         for ($i = 0; $i < count($products); $i++) {
 
-            if ((($i+1) % 2) == 0) {
+            if ((($i+1) % 4) == 0) {
                 $ad = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->inRandomOrder()->first();
                 if($ad){
                     $ad->id = 0;

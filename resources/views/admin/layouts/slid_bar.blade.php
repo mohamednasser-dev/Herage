@@ -90,7 +90,7 @@
                                 <a href="/admin-panel/products/show">{{ __('messages.show') }}</a>
                             </li>
                             <li class="reports">
-                                <a href="/admin-panel/products/comments">{{ __('messages.reports') }}
+                                <a href="/admin-panel/products/reports">{{ __('messages.reports') }}
                                     @if( $reports_count> 0 )
                                         <span class="unreadcount">
                                         <span class="insidecount">

@@ -16,6 +16,7 @@
                         <thead>
                         <tr>
                             <th class="text-center">Id</th>
+                            <th class="text-center">{{ __('messages.reported') }}</th>
                             <th class="text-center">{{ __('messages.reporter_name') }}</th>
                             <th class="text-center">{{ __('messages.ad_name') }}</th>
                             <th class="text-center">{{ __('messages.user') }}</th>
@@ -31,6 +32,7 @@
                         @foreach ($data as $row)
                             <tr>
                                 <td class="text-center"><?=$i;?></td>
+                                <td class="text-center">{{ $row->content }}</td>
                                 <td class="text-center">{{ $row->User->name }}</td>
                                 <td class="text-center">{{ $row->Product->title }}</td>
                                 <td class="text-center">
