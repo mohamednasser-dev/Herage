@@ -332,5 +332,6 @@ return [
     "upload_main_image" => "رفع الصورة الرئيسية",
     "product_images" => "صور اعلان المستخدم",
     "show_buy" => "اظهار الشراء",
+    "category_has_products_add" => "القسم به منتجات .. لا يمكن إضافة أقسام فرعية",
 ];
 ?>

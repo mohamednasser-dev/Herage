@@ -43,7 +43,9 @@
                             <th class="text-center">Id</th>
                             <th class="text-center">{{ __('messages.image') }}</th>
                             <th class="text-center">{{ __('messages.name') }}</th>
+
                             <th class="text-center">{{ __('messages.sub_category_second') }}</th>
+
                             <th class="text-center">{{ __('messages.cat_options') }}</th>
                             @if(Auth::user()->update_data)<th class="text-center">{{ __('messages.edit') }}</th>@endif
                             @if(Auth::user()->delete_data)<th class="text-center" >{{ __('messages.delete') }}</th>@endif
@@ -56,7 +58,9 @@
                                 <td class="text-center"><?=$i;?></td>
                                 <td class="text-center"><img src="{{image_cloudinary_url()}}{{ $row->image }}"  /></td>
                                 <td class="text-center blue-color">{{ app()->getLocale() == 'en' ? $row->title_en : $row->title_ar }}</td>
+
                                 <td class="text-center blue-color">
+                                    @if($row->category_id != 7)
                                     <a href="{{route('sub_two_cat.show',$row->id)}}">
                                         <div class="">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -68,7 +72,9 @@
                                             </svg>
                                         </div>
                                     </a>
+                                    @endif
                                 </td>
+
                                 <td class="text-center blue-color">
                                     <a href="{{route('sub_cat_options.show',$row->id)}}">
                                         <div class="">
@@ -82,11 +88,18 @@
                                         </div>
                                     </a>
                                 </td>
+
                                 @if(Auth::user()->update_data)
-                                    <td class="text-center blue-color" ><a href="{{ route( 'sub_cat.edit', $row->id ) }}" ><i class="far fa-edit"></i></a></td>
+                                    <td class="text-center blue-color" >
+                                        <a href="{{ route( 'sub_cat.edit', $row->id ) }}" ><i class="far fa-edit"></i></a></td>
                                 @endif
+
                                 @if(Auth::user()->delete_data)
-                                    <td class="text-center blue-color" ><a onclick="return confirm('{{ __('messages.are_you_sure') }}');" href="{{ route('sub_cat.delete', $row->id) }}" ><i class="far fa-trash-alt"></i></a></td>
+                                    <td class="text-center blue-color" >
+                                        @if($row->category_id != 7)
+                                            <a onclick="return confirm('{{ __('messages.are_you_sure') }}');" href="{{ route('sub_cat.delete', $row->id) }}" ><i class="far fa-trash-alt"></i></a>
+                                        @endif
+                                    </td>
                                 @endif
                                 <?php $i++; ?>
                             </tr>

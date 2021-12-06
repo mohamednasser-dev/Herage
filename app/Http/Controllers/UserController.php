@@ -70,22 +70,35 @@ class UserController extends Controller
     public function get_account_types(Request $request)
     {
         $lang = $request->lang;
+        $user = auth()->user();
         Session::put('api_lang', $lang);
         $data = Account_type::where('type', 'commercial')
             ->select('id', 'name_' . $lang . ' as name')
-            ->get();
+            ->get()->map(function ($data) use ($user) {
+                if ($user) {
+                    if ($user->account_type == $data->id) {
+                        $data->is_selected = true;
+                    } else {
+                        $data->is_selected = false;
+                    }
+                } else {
+                    $data->is_selected = false;
+                }
+                return $data;
+            });
         $response = APIHelpers::createApiResponse(false, 200, '', '', $data, $lang);
         return response()->json($response, 200);
     }
-    public function retweet(Request $request,$ad_id)
+
+    public function retweet(Request $request, $ad_id)
     {
 
         $lang = $request->lang;
         Session::put('api_lang', $lang);
 
         $data = Product::find($ad_id);
-        if($data){
-            if($data->retweet == 0){
+        if ($data) {
+            if ($data->retweet == 0) {
 
 
                 //create expier day
@@ -98,17 +111,17 @@ class UserController extends Controller
                 $data->expiry_date = $final_expire_pin_date;
                 $data->created_at = $mytime;
                 $data->status = 1;
-                $data->retweet = 1 ;
+                $data->retweet = 1;
                 $data->save();
 
                 $response = APIHelpers::createApiResponse(false, 200, 'retweet used successfully', 'تم استخدام الريتويت بنجاح', $data, $lang);
                 return response()->json($response, 200);
-            }else{
+            } else {
                 $response = APIHelpers::createApiResponse(true, 406, 'retweet used before', 'تم أستخدام الريتويت من قبل', (object)[], $request->lang);
                 return response()->json($response, 406);
             }
 
-        }else{
+        } else {
             $response = APIHelpers::createApiResponse(true, 406, 'you should choose valid ad', 'يجب اختيار اعلان صحيح', (object)[], $request->lang);
             return response()->json($response, 406);
         }
@@ -118,9 +131,22 @@ class UserController extends Controller
     public function get_specialties(Request $request)
     {
         $lang = $request->lang;
+        $user = auth()->user();
         Session::put('api_lang', $lang);
         $data = specialty::select('id', 'name_' . $lang . ' as name')
-            ->get();
+            ->get()->map(function ($data) use ($user) {
+                if ($user) {
+                    $exists_specialty = User_specialty::where('special_id', $data->id)->where('user_id', $user->id)->first();
+                    if ($exists_specialty) {
+                        $data->is_selected = true;
+                    } else {
+                        $data->is_selected = false;
+                    }
+                } else {
+                    $data->is_selected = false;
+                }
+                return $data;
+            });
         $response = APIHelpers::createApiResponse(false, 200, '', '', $data, $lang);
         return response()->json($response, 200);
     }
@@ -176,9 +202,9 @@ class UserController extends Controller
 
     }
 
-    public function updateprofile(Request $request)
+    public function update_profile(Request $request)
     {
-        $lang = $request->lang ;
+        $lang = $request->lang;
         Session::put('api_lang', $lang);
         $input = $request->all();
         $user = auth()->user();
@@ -638,14 +664,15 @@ class UserController extends Controller
     }
 
     // nasser code
-    public function my_account(Request $request){
+    public function my_account(Request $request)
+    {
 
         $lang = $request->lang;
         $user = auth()->user();
         Session::put('api_lang', $lang);
         $data['personal_data'] = User::with('City')->with('Area')->with('Account_type')
             ->where('id', $user->id)
-            ->select('id','name', 'email', 'about_user', 'image', 'cover', 'phone', 'watsapp', 'city_id', 'area_id', 'account_type', 'created_at')
+            ->select('id', 'name', 'email', 'about_user', 'image', 'cover', 'phone', 'watsapp', 'city_id', 'area_id', 'account_type', 'created_at')
             ->first();
 
         $user_specialties = User_specialty::with('Specialty')
@@ -669,12 +696,12 @@ class UserController extends Controller
         $products = Product::with('City')->with('Area')->with('Publisher')->where('status', 2)
             ->where('deleted', 0)
             ->where('user_id', auth()->user()->id)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id','retweet')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id', 'retweet')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
 
-            if( $products[$i]['retweet_date'] < Carbon::now()){
+            if ($products[$i]['retweet_date'] < Carbon::now()) {
                 $products[$i]['retweet'] = 1;
             }
             if ($lang == 'ar') {
@@ -707,12 +734,12 @@ class UserController extends Controller
             ->where('publish', 'Y')
             ->where('deleted', 0)
             ->where('user_id', auth()->user()->id)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id','retweet')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id', 'retweet')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($current_products); $i++) {
 
-            if( $current_products[$i]['retweet_date'] < Carbon::now()){
+            if ($current_products[$i]['retweet_date'] < Carbon::now()) {
                 $current_products[$i]['retweet'] = 1;
             }
 

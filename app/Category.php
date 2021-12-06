@@ -19,4 +19,8 @@ class Category extends Model
             });
         });
     }
+
+    public function ViewSubCategories() {
+        return $this->hasMany('App\SubCategory', 'category_id')->where('deleted', 0);
+    }
 }

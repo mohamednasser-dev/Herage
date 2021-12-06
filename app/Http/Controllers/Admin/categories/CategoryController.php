@@ -32,6 +32,30 @@ class CategoryController extends AdminController{
     // get all categories
     public function show(){
         $data['categories'] = Category::where('deleted' , 0)->orderBy('sort' , 'asc')->get();
+        $data['prevent_next_level'] = false;
+        if ($data['categories'] && count($data['categories']) > 0) {
+            foreach($data['categories'] as $row) {
+                $row->next_level = false;
+                if ($row->ViewSubCategories && count($row->ViewSubCategories) > 0) {
+                    $hasProducts = false;
+                    for ($i = 0; $i < count($row->ViewSubCategories); $i ++) {
+                        if (count($row->ViewSubCategories[$i]->products) > 0) {
+                            $hasProducts = true;
+                        }
+                    }
+    
+                    if ($hasProducts) {
+                        $row->next_level = true;
+                    }
+                }
+
+                if (count($row->products) > 0 && $row->next_level == false) {
+                    $data['prevent_next_level'] = true;
+                    break;
+                }
+            }
+        }
+        
         return view('admin.categories.index' , ['data' => $data]);
     }
     // get edit page

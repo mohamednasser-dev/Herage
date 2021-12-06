@@ -338,7 +338,8 @@
         "main_image" => "Main Image",
         "upload_main_image" => "Upload Main Image",
         "product_images" => "Product Images",
-					"show_buy" => "Show Buy Button",
+        "show_buy" => "Show Buy Button",
+        "category_has_products_add" => "Category has products .. you can not add sub categories",
 
     ];
 ?>
