@@ -1678,7 +1678,7 @@ class ProductController extends Controller
         }
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
-            'content' => 'required',
+            'report_content' => 'required',
         ]);
         if ($validator->fails()) {
             $response = APIHelpers::createApiResponse(true, 406, $validator->errors()->first(), $validator->errors()->first(), null, $request->lang);
@@ -1692,7 +1692,7 @@ class ProductController extends Controller
             $favorite = new Product_report();
             $favorite->user_id = $user->id;
             $favorite->product_id = $request->product_id;
-            $favorite->content = $request->content;
+            $favorite->report_content = $request->report_content;
             $favorite->save();
             $response = APIHelpers::createApiResponse(false, 200, '', '', $favorite, $request->lang);
             return response()->json($response, 200);

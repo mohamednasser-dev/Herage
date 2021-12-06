@@ -9,6 +9,11 @@
                         <h4>{{ __('messages.reports') }}</h4>
                     </div>
                 </div>
+{{--                <div class="row">--}}
+{{--                    <div class="col-xl-12 col-md-12 col-sm-12 col-12">--}}
+{{--                        <a class="btn btn-primary" href="/admin-panel/categories/add">{{ __('messages.reports_resons') }}</a>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
             </div>
             <div class="widget-content widget-content-area">
                 <div class="table-responsive">
@@ -32,7 +37,7 @@
                         @foreach ($data as $row)
                             <tr>
                                 <td class="text-center"><?=$i;?></td>
-                                <td class="text-center">{{ $row->content }}</td>
+                                <td class="text-center">{{ $row->report_content }}</td>
                                 <td class="text-center">{{ $row->User->name }}</td>
                                 <td class="text-center">{{ $row->Product->title }}</td>
                                 <td class="text-center">
