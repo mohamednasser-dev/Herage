@@ -201,6 +201,9 @@ class HomeController extends Controller
             array_push($new_ad , $products[$i]);
             if ((($i+1) % 4) == 0) {
                 $ad = Ad::where('city_id', $visitor->city_id)->select('id', 'image', 'type', 'content')->where('place', 1)->inRandomOrder()->first();
+                if (!$ad) {
+                    $ad = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->inRandomOrder()->first();
+                }
                 if($ad){
                     $ad->id = 0;
                     $ad->title = $ad->content;

@@ -1366,6 +1366,7 @@ class ProductController extends Controller
             ->simplePaginate(12);
 //        $products = $products
 //            ->simplePaginate(12);
+
         for ($i = 0; $i < count($products); $i++) {
             if($lang == 'ar'){
                 $products[$i]['Product']->address = $products[$i]['Product']->City->title_ar .' , '.$products[$i]['Product']->Area->title_ar;
