@@ -96,6 +96,7 @@ class SubTwoCategoryController extends AdminController
 
     public function edit($id) {
         $data = SubTwoCategory::where('id',$id)->first();
+        
         return view('admin.categories.sub_category.sub_two_category.edit', compact('data'));
     }
     public function update(Request $request, $id) {
@@ -103,7 +104,8 @@ class SubTwoCategoryController extends AdminController
         $data = $this->validate(\request(),
             [
                 'title_ar' => 'required',
-                'title_en' => 'required'
+                'title_en' => 'required',
+                'color' => ''
             ]);
         if($request->file('image')){
             $image = $model->image;
