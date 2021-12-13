@@ -252,11 +252,12 @@ class HomeController extends Controller
                             ->where('deleted', 0)
                             ->where('reviewed', 1)
                             ->where('area_id', $area_id)
-                            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+                            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
                             ->orderBy('created_at', 'desc')
                             ->simplePaginate(12);
         $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             if($lang == 'ar'){
                 $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
             }else{
