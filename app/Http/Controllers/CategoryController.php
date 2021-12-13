@@ -18,6 +18,7 @@ use App\SubCategory;
 use App\Favorite;
 use App\Category;
 use App\Product;
+use App\Setting;
 
 
 class CategoryController extends Controller
@@ -170,12 +171,13 @@ class CategoryController extends Controller
         //end all button
 
         $lang = $request->lang;
-        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->with('Publisher');
+        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('reviewed', 1)->with('Publisher');
         if ($request->category_id != 0) {
             $products = $products->where('category_id', $request->category_id);
         }
-        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
+        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
         ->orderBy('created_at', 'desc')->simplePaginate(12);
+        $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
             
         for ($i = 0; $i < count($products); $i++) {
             if($lang == 'ar'){
@@ -185,8 +187,7 @@ class CategoryController extends Controller
             }
             
             $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
-            $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
-            $products[$i]['views'] = $views;
+            
             $user = auth()->user();
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
@@ -206,7 +207,7 @@ class CategoryController extends Controller
                 $products[$i]['favorite'] = false;
                 $products[$i]['conversation_id'] = 0;
             }
-            $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
         }
 
         $data['products'] = $products;
@@ -268,15 +269,15 @@ class CategoryController extends Controller
         
        
         if ($request->sub_category_id == 0) {
-            $products = Product::where('status', 1)->with('Publisher')->where('publish', 'Y')->where('deleted', 0)
-                ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
+            $products = Product::where('status', 1)->with('Publisher')->where('publish', 'Y')->where('deleted', 0)->where('reviewed', 1)
+                ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
                 ->orderBy('created_at', 'desc')->simplePaginate(12);
         } else {
-            $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('sub_category_id', $request->sub_category_id)->with('Publisher')
-                ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
+            $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('reviewed', 1)->where('sub_category_id', $request->sub_category_id)->with('Publisher')
+                ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
                 ->orderBy('created_at', 'desc')->simplePaginate(12);
         }
-        
+        $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
             if($lang == 'ar'){
                 $products[$i]['address'] = $products[$i]['City']->title_ar;
@@ -284,8 +285,7 @@ class CategoryController extends Controller
                 $products[$i]['address'] = $products[$i]['City']->title_en;
             }
             $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
-            $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
-            $products[$i]['views'] = $views;
+            
             $user = auth()->user();
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
@@ -305,7 +305,7 @@ class CategoryController extends Controller
                 $products[$i]['favorite'] = false;
                 $products[$i]['conversation_id'] = 0;
             }
-            $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
         }
 
         $data['products'] = $products;
@@ -386,8 +386,8 @@ class CategoryController extends Controller
         }
         
         //end all button
-        $products = Product::where('status', 1)->where('deleted', 0)->where('publish', 'Y')->with('Publisher')
-            ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price');
+        $products = Product::where('status', 1)->where('deleted', 0)->where('reviewed', 1)->where('publish', 'Y')->with('Publisher')
+            ->where('category_id', $request->category_id)->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views');
         if ($request->sub_category_id != 0) {
             $products = $products->where('sub_category_two_id', $request->sub_category_id);
         }
@@ -397,7 +397,7 @@ class CategoryController extends Controller
         }
 
         $products = $products->orderBy('created_at', 'desc')->simplePaginate(12);
-
+        $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar;
@@ -405,8 +405,7 @@ class CategoryController extends Controller
                 $products[$i]['address'] = $products[$i]['City']->title_en;
             }
             $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
-            $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
-            $products[$i]['views'] = $views;
+            
             $user = auth()->user();
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
@@ -425,7 +424,7 @@ class CategoryController extends Controller
                 $products[$i]['favorite'] = false;
                 $products[$i]['conversation_id'] = 0;
             }
-            $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
         }
         $data['products'] = $products;
 
@@ -508,7 +507,7 @@ class CategoryController extends Controller
             $data['category'] = Category::where('id', $request->category_id)->select('id', 'title_' . $lang . ' as title')->first();
         }
 
-        $products = Product::where('status', 1)->where('deleted', 0)->where('publish', 'Y')->with('Publisher');
+        $products = Product::where('status', 1)->where('deleted', 0)->where('reviewed', 1)->where('publish', 'Y')->with('Publisher');
         if ($request->sub_category_id != 0) {
             $products = $products->where('sub_category_three_id', $request->sub_category_id);
 
@@ -522,8 +521,9 @@ class CategoryController extends Controller
             $products = $products->where('sub_category_id', $request->sub_category_level1_id);
         }
 
-        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
+        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
             ->orderBy('created_at', 'desc')->simplePaginate(12);
+        $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar;
@@ -531,8 +531,7 @@ class CategoryController extends Controller
                 $products[$i]['address'] = $products[$i]['City']->title_en;
             }
             $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
-            $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
-            $products[$i]['views'] = $views;
+           
             $user = auth()->user();
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
@@ -551,7 +550,7 @@ class CategoryController extends Controller
                 $products[$i]['favorite'] = false;
                 $products[$i]['conversation_id'] = 0;
             }
-            $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
         }
         $data['products'] = $products;
 
@@ -626,7 +625,7 @@ class CategoryController extends Controller
         
         
 
-        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->with('Publisher');
+        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('reviewed', 1)->with('Publisher');
         if ($request->sub_category_id != 0) {
             $products = $products->where('sub_category_four_id', $request->sub_category_id);
         }
@@ -639,8 +638,9 @@ class CategoryController extends Controller
         if ($request->sub_category_level1_id != 0) {
             $products = $products->where('sub_category_id', $request->sub_category_level1_id);
         }
-        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
+        $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
             ->orderBy('created_at', 'desc')->simplePaginate(12);
+        $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar;
@@ -648,8 +648,7 @@ class CategoryController extends Controller
                 $products[$i]['address'] = $products[$i]['City']->title_en;
             }
             $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
-            $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
-            $products[$i]['views'] = $views;
+            
             $user = auth()->user();
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
@@ -668,7 +667,7 @@ class CategoryController extends Controller
                 $products[$i]['favorite'] = false;
                 $products[$i]['conversation_id'] = 0;
             }
-            $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
         }
         
         $data['products'] = $products;
@@ -727,7 +726,7 @@ class CategoryController extends Controller
             $data['sub_category_array'] = SubFiveCategory::where('deleted', '0')->where('sub_category_id', $request->sub_category_level4_id)->select('id', 'image', 'title_' . $lang . ' as title')->orderBy('sort', 'asc')->get()->toArray();
         }
 
-        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->with('Publisher');
+        $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('reviewed', 1)->with('Publisher');
         if ($request->sub_category_level1_id != 0) {
             $products = $products->where('sub_category_id', $request->sub_category_level1_id);
         }
@@ -741,8 +740,9 @@ class CategoryController extends Controller
             $products = $products->where('sub_category_four_id', $request->sub_category_level4_id);
         }
         $products = $products->where('sub_category_five_id', $request->sub_category_id)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'views')
             ->where('publish', 'Y')->orderBy('created_at', 'desc')->simplePaginate(12);
+        $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
@@ -750,8 +750,7 @@ class CategoryController extends Controller
                 $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
             }
             $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
-            $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
-            $products[$i]['views'] = $views;
+            
             $user = auth()->user();
             if ($user) {
                 $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['id'])->first();
@@ -771,7 +770,7 @@ class CategoryController extends Controller
                 $products[$i]['conversation_id'] = 0;
             }
             $month = $products[$i]['created_at']->format('F');
-            $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
         }
         $data['products'] = $products;
         $response = APIHelpers::createApiResponse(false, 200, '', '', $data, $request->lang);

@@ -176,7 +176,7 @@ class APIHelpers
 
     public static function send_chat_notification($tokens, $title = "hello", $msg = "helo msg", $type = 1, $chat = null, $jobs = null)
     {
-        $key = 'AAAAVXMYan4:APA91bF_EP7-zAn8ZTNCHuBWkUQigGY8LIyGLc4M74ChM3SJkR3BI6kPl9YelKGY7OcfHj_hUg53egi6Mhna02hYzg0oHTGCAPEGLvhVXhb0RYtpdnama5RNHbuukxB7tX48fY-pJQ1_';
+        $key = 'AAAAvOJBk3Q:APA91bHVaAFJhWOEbIO9KGlGmIutw1yZoOlR4-Zu6h5jiCSx5D-7Fev0vziGKZVdgIahfuciP-14gBnltkXV724l0025l4UbuYsLuG_f0iqG9Mv_Yf96TqdfG3s1YveueMN4iSQJWVJP';
         $fields = array
         (
             "registration_ids" => (array)$tokens,  //array of user token whom notification sent two

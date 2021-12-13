@@ -89,6 +89,17 @@
                 <div class="custom-file-container__image-preview"></div>
             </div>
             <div class="form-group">
+                <label for="city_id">{{ __('messages.city') }}</label>
+                <select class="form-control" name="city_id" id="city_id">
+                    <option selected>{{ __('messages.select') }}</option>
+                    @if ($data['cities'] && count($data['cities']) > 0)
+                    @foreach ($data['cities'] as $item)
+                    <option {{ $item->id == $data['ad']->city_id ? 'selected' : '' }} value="{{ $item->id }}">{{ App::isLocal('en') ? $item->title_en : $item->title_ar }}</option>
+                    @endforeach
+                    @endif
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="sel1">{{ __('messages.ad_place') }}</label>
                 <select class="form-control" name="place" id="sel1">
                     <option selected>{{ __('messages.select') }}</option>

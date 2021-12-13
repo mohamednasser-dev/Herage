@@ -16,7 +16,8 @@ use App\Category;
 use App\Product;
 use App\Main_ad;
 use App\Ad;
-
+use App\Setting;
+use App\Visitor;
 
 class HomeController extends Controller
 {
@@ -118,14 +119,28 @@ class HomeController extends Controller
     }
 
     public function getHomeAds(Request $request){
-        $ads = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->get();
+        if (!$request->header('uniqueid')) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header' , 'unique id required header'  , null , $request->lang);
+            return response()->json($response , 406);
+        }
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $ads = Ad::where('city_id', $visitor->city_id)->select('id', 'image', 'type', 'content')->where('place', 1)->get();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         $user = auth()->user();
         $cat_ids =[];
         $category = '\App\Category';
         $categories = $this->getCatsSubCats($category, $lang, true, 0, true);
-
+        $setting = Setting::where('id', 1)->select('ignore_review', 'show_views')->first();
+        if ($setting->ignore_review == 1) {
+            $prods = Product::where('reviewed', 0)->select('id', 'reviewed')->get()
+            ->map(function($row) {
+                $row->reviewed = 1;
+                $row->save();
+                return $row;
+            });
+            
+        }
         // $categories = Category::where(function ($q) {
         //     $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
         //         $qq->has('Products', '>', 0);
@@ -144,10 +159,13 @@ class HomeController extends Controller
             ->with('Publisher')
             ->where('publish', 'Y')
             ->where('deleted', 0)
+            ->where('reviewed', 1)
             ->whereIn('category_id', $cat_ids)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
             ->orderBy('created_at', 'desc')
             ->get()->makeHidden(['City','Area']);
+            $data['show_views'] = $setting['show_views'];
+            
 
         for ($i = 0; $i < count($products); $i++) {
             if ($lang == 'ar') {
@@ -174,7 +192,7 @@ class HomeController extends Controller
                 $products[$i]['favorite'] = false;
                 $products[$i]['conversation_id'] = 0;
             }
-            $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
         }
 
         $new_ad = [];
@@ -182,7 +200,7 @@ class HomeController extends Controller
         for ($i = 0; $i < count($products); $i++) {
             array_push($new_ad , $products[$i]);
             if ((($i+1) % 4) == 0) {
-                $ad = Ad::select('id', 'image', 'type', 'content')->where('place', 1)->inRandomOrder()->first();
+                $ad = Ad::where('city_id', $visitor->city_id)->select('id', 'image', 'type', 'content')->where('place', 1)->inRandomOrder()->first();
                 if($ad){
                     $ad->id = 0;
                     $ad->title = $ad->content;
@@ -232,10 +250,12 @@ class HomeController extends Controller
                             ->with('Publisher')
                             ->where('publish', 'Y')
                             ->where('deleted', 0)
+                            ->where('reviewed', 1)
                             ->where('area_id', $area_id)
                             ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id')
                             ->orderBy('created_at', 'desc')
                             ->simplePaginate(12);
+        $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
             if($lang == 'ar'){
                 $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
@@ -261,9 +281,10 @@ class HomeController extends Controller
                 $products[$i]['favorite'] = false;
                 $products[$i]['conversation_id'] = 0;
             }
-            $products[$i]['time'] = APIHelpers::get_month_day($products[$i]['created_at'], $lang);
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
         }
-        $response = APIHelpers::createApiResponse(false, 200, '', '', $products, $request->lang);
+        $data['products'] = $products;
+        $response = APIHelpers::createApiResponse(false, 200, '', '', $data, $request->lang);
         return response()->json($response, 200);
     }
 

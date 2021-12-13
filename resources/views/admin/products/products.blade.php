@@ -31,6 +31,7 @@
                             <th class="text-center">{{ __('messages.publication_date') }}</th>
                             <th class="text-center">{{ __('messages.product_name') }}</th>
                             <th class="text-center">{{ __('messages.user') }}</th>
+                            <th class="text-center">{{ __('messages.show_ad') }}</th>
                             <th class="text-center">{{ __('messages.details') }}</th>
                             <th class="text-center">{{ __('messages.comments') }}</th>
                             @if(Auth::user()->delete_data)
@@ -54,6 +55,13 @@
                                     <a href="{{ route('users.details', $product->user->id) }}" target="_blank">
                                         {{ $product->user->name }}
                                     </a>
+                                </td>
+                                <td class="text-center blue-color">
+                                    @if ($product->reviewed == 0)
+                                    <a onclick="return confirm('Are you sure?');" href="{{ route('products.review', $product->id) }}"><i class="far fa-eye"></i></a>
+                                    @else
+                                    {{ __('messages.showed') }}
+                                    @endif 
                                 </td>
                                 <td class="text-center blue-color">
                                     <a href="{{ route('products.details', $product->id) }}"><i class="far fa-eye"></i></a>

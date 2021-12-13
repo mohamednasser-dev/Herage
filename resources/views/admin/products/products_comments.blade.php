@@ -20,7 +20,7 @@
                             <th class="text-center">{{ __('messages.ad_name') }}</th>
                             <th class="text-center">{{ __('messages.comment') }}</th>
                             <th class="text-center">{{ __('messages.ad_details') }}</th>
-                            <th class="text-center">{{ __('messages.approval') }}</th>
+                            {{-- <th class="text-center">{{ __('messages.approval') }}</th> --}}
                         </tr>
                         </thead>
                         <tbody>
@@ -35,7 +35,7 @@
                                     <a href="{{ route('products.details', $row->Product->id) }}"><i
                                             class="far fa-eye"></i></a>
                                 </td>
-                                <td class="text-center blue-color">
+                                {{-- <td class="text-center blue-color">
                                     @if($row->status == 'new')
                                         <a href="{{route('comment.approve',['type'=>'accepted','id'=>$row->id])}}"
                                            class="btn btn-success mb-2 mr-2 rounded-circle bs-tooltip"
@@ -82,7 +82,7 @@
                                             </svg>
                                         </a>
                                     @endif
-                                </td>
+                                </td> --}}
                                 <?php $i++; ?>
                             </tr>
                         @endforeach

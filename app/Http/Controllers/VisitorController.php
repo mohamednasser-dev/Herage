@@ -18,7 +18,7 @@ class VisitorController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api' , ['except' => ['create']]);
+        $this->middleware('auth:api' , ['except' => ['create', 'updateCity']]);
     }
 
     public function index()
@@ -49,6 +49,23 @@ class VisitorController extends Controller
             $visitor->save();
         }
 
+
+        $response = APIHelpers::createApiResponse(false , 200 , '' , '' , $visitor , $request->lang);
+        return response()->json($response , 200);
+    }
+
+    // update city
+    public function updateCity(Request $request) {
+        if (!$request->header('uniqueid') && $request->city_id) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header && city id required field' , 'unique id required header && city id required field'  , null , $request->lang);
+            return response()->json($response , 406);
+        }
+
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('id', 'city_id', 'unique_id')->first();
+        if ($visitor) {
+            $visitor->city_id = $request->city_id;
+            $visitor->save();
+        }
 
         $response = APIHelpers::createApiResponse(false , 200 , '' , '' , $visitor , $request->lang);
         return response()->json($response , 200);

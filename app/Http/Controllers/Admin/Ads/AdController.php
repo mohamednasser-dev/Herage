@@ -7,12 +7,15 @@ use Illuminate\Http\Request;
 use App\Product;
 use App\User;
 use App\Ad;
+use App\City;
 
 class AdController extends AdminController{
 
     // type get
     public function AddGet(){
         $data['users'] = User::orderBy('created_at', 'desc')->get();
+        $data['cities'] = City::where('deleted', '0')->get();
+        
         return view('admin.ads.ad_form', ["data" => $data]);
     }
 
@@ -33,7 +36,9 @@ class AdController extends AdminController{
         }else {
             $ad->type = "id";
         }
+        $ad->city_id = $request->city_id;
         $ad->save();
+
         session()->flash('success', trans('messages.added_s'));
         return redirect('admin-panel/ads/show');
     }
@@ -48,6 +53,7 @@ class AdController extends AdminController{
     public function EditGet(Request $request){
         $data['ad'] = Ad::find($request->id);
         $data['users'] = User::orderBy('created_at', 'desc')->get();
+        $data['cities'] = City::where('deleted', '0')->get();
 
         if ($data['ad']['type'] == 'id') {
             $data['product'] = Product::find($data['ad']['content']);
@@ -80,7 +86,7 @@ class AdController extends AdminController{
         }
         $ad->content = $request->content;
         $ad->place = $request->place;
-        // dd($ad);
+        $ad->city_id = $request->city_id;
         $ad->save();
         session()->flash('success', trans('messages.updated_s'));
         return redirect('admin-panel/ads/show');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\categories;
 
 use App\Http\Controllers\Admin\AdminController;
+use App\SubCategory;
 use JD\Cloudder\Facades\Cloudder;
 use Illuminate\Http\Request;
 use App\SubTwoCategory;
@@ -16,7 +17,8 @@ class SubTwoCategoryController extends AdminController
     }
     public function create($id)
     {
-        return view('admin.categories.sub_category.sub_two_category.create',compact('id'));
+        $subTwo = SubCategory::where('id', $id)->first();
+        return view('admin.categories.sub_category.sub_two_category.create',compact('id', 'subTwo'));
     }
     public function store(Request $request)
     {
@@ -25,7 +27,8 @@ class SubTwoCategoryController extends AdminController
                 'sub_category_id' => 'required',
                 'title_ar' => 'required',
                 'title_en' => 'required',
-                'image' => 'required'
+                'image' => 'required',
+                'color' => ''
             ]);
 
         $image_name = $request->file('image')->getRealPath();

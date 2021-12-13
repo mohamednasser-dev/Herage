@@ -134,8 +134,43 @@
                                         <input type="number" min="1" name="expier_days" class="form-control" id="expier_days"
                                                value="{{$data['setting']['expier_days']}}">
                                     </div>
+                                    <div class="col-md-4">
+                                        <label for="plan_price"> &nbsp; </label>
+                                        <div class="form-check pl-0">
+                                            <div class="custom-control custom-checkbox checkbox-info">
+                                                <input type="checkbox" {{ $data['setting']['show_buy'] == 1 ? 'checked' : ''}} class="custom-control-input" name="show_buy"
+                                                       id="show_buy">
+                                                <label class="custom-control-label"
+                                                       for="show_buy">{{ __('messages.show_buy') }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="plan_price"> &nbsp; </label>
+                                        <div class="form-check pl-0">
+                                            <div class="custom-control custom-checkbox checkbox-info">
+                                                <input type="checkbox" {{ $data['setting']['show_views'] == 1 ? 'checked' : ''}} class="custom-control-input" name="show_views"
+                                                       id="show_views">
+                                                <label class="custom-control-label"
+                                                       for="show_views">{{ __('messages.show_views') }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <label for="plan_price"> &nbsp; </label>
+                                        <div class="form-check pl-0">
+                                            <div class="custom-control custom-checkbox checkbox-info">
+                                                <input type="checkbox" {{ $data['setting']['ignore_review'] == 1 ? 'checked' : ''}} class="custom-control-input" name="ignore_review"
+                                                       id="ignore_review">
+                                                <label class="custom-control-label"
+                                                       for="ignore_review">{{ __('messages.ignore_review') }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
                     <input type="submit" value="{{ __('messages.edit') }}" class="btn btn-primary">
