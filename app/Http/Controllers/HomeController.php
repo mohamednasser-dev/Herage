@@ -252,7 +252,7 @@ class HomeController extends Controller
                             ->where('deleted', 0)
                             ->where('reviewed', 1)
                             ->where('area_id', $area_id)
-                            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price')
+                            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
                             ->orderBy('created_at', 'desc')
                             ->simplePaginate(12);
         $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
