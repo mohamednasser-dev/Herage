@@ -287,9 +287,9 @@ class ProductController extends Controller
                 $ads->time = $ads->created_at->diffForHumans();
                 return $ads;
             });
-
+            $show_views = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         $response = APIHelpers::createApiResponse(false, 200, '', '', array('product' => $data,
-            'features' => $feature_data, 'comments' => $comments, 'related' => $related), $request->lang);
+            'features' => $feature_data, 'comments' => $comments, 'related' => $related, 'show_views' => $show_views), $request->lang);
         return response()->json($response, 200);
     }
 
@@ -761,8 +761,9 @@ class ProductController extends Controller
             ->orderBy('pin', 'desc')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
+            
         for ($i = 0; $i < count($products); $i++) {
-            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
             $user = auth()->user();
