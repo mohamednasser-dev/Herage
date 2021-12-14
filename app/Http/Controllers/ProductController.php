@@ -579,7 +579,7 @@ class ProductController extends Controller
             ->where('status', 1)
             ->where('category_id',7);
             
-            $products = $products->select('id', 'title', 'price','sub_category_id', 'main_image as image', 'created_at', 'pin','city_id','area_id', 'user_id','latitude','longitude')
+            $products = $products->select('id', 'title', 'price','sub_category_id', 'sub_category_two_id', 'main_image as image', 'created_at', 'pin','city_id','area_id', 'user_id','latitude','longitude')
             ->orderBy('pin', 'desc')
             ->orderBy('created_at', 'desc')
             ->get()->makeHidden(['City','Area', 'Sub_two_category']);
@@ -633,7 +633,7 @@ class ProductController extends Controller
             if ($request->sub_category_id && $request->sub_category_id) {
                 $products = $products->where('sub_category_id', $request->sub_category_id);
             }
-            $products = $products->select('id', 'title', 'price','sub_category_id', 'main_image as image', 'created_at', 'pin','city_id','area_id', 'user_id','latitude','longitude')
+            $products = $products->select('id', 'title', 'price','sub_category_id', 'sub_category_two_id', 'main_image as image', 'created_at', 'pin','city_id','area_id', 'user_id','latitude','longitude')
             ->orderBy('pin', 'desc')
             ->orderBy('created_at', 'desc')
             ->get()->makeHidden(['City','Area', 'Sub_two_category']);
