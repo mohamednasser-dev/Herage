@@ -21,7 +21,7 @@ class Product extends Model
     }
     public function Sub_two_category() {
 
-        return $this->belongsTo('App\SubTwoCategory', 'sub_category_two_id')->select('id','title_'.session('api_lang').' as title');
+        return $this->belongsTo('App\SubTwoCategory', 'sub_category_two_id')->select('id','color');
     }
     public function user() {
         return $this->belongsTo('App\User', 'user_id');
