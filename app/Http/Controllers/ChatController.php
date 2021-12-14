@@ -58,6 +58,7 @@ class ChatController extends Controller
         $user_id = auth()->user()->id;
         $lang = $request->lang;
         $data['conversations'] = Participant::where('user_id', $user_id)
+        ->orderBy('id', 'desc')
             ->get()
             ->map(function ($convs) {
                 $other_user = Participant::where('conversation_id', $convs->conversation_id)->where('user_id', '!=', auth()->user()->id)->first();
@@ -223,7 +224,7 @@ class ChatController extends Controller
             $days = Message::where('ad_product_id', $request->id)
                 ->where('conversation_id', $request->conversation_id)
                 ->select('id', 'message', 'type', 'user_id', 'conversation_id', 'ad_product_id', 'created_at')
-                ->orderBy('created_at', 'asc')
+                ->orderBy('created_at', 'desc')
                 ->get()
                 ->map(function ($messages) use ($user_id) {
                     $messages->time = $messages->created_at->format('g:i a');

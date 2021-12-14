@@ -39,7 +39,21 @@ class SettingController extends AdminController{
         $setting->twitter = $request->twitter;
         $setting->snap_chat = $request->snap_chat;
         $setting->expier_days = $request->expier_days;
-
+        $show_buy = 0; 
+        if ($request->show_buy) {
+            $show_buy = 1;
+        }
+        $setting->show_buy = $show_buy;
+        $show_views = 0; 
+        if ($request->show_views) {
+            $show_views = 1;
+        }
+        $setting->show_views = $show_views;
+        $ignore_review = 0;
+        if ($request->ignore_review) {
+            $ignore_review = 1;
+        }
+        $setting->ignore_review = $ignore_review;
 		$setting->save();
         return  back();
     }

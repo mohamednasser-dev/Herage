@@ -142,6 +142,9 @@ use Illuminate\Http\Request;
     //search ads
     Route::post('/ads/search/{lang}/{v}' , 'ProductController@getsearch');
     Route::get('/map/ads/{lang}/{v}' , 'ProductController@map_ads');
+    Route::get('/map/ads/level2/{sub_category_id}/{lang}/{v}' , 'ProductController@map_ads_sub_cat_two');
+    Route::get('/map/ads/last_level/{sub_category_id}/{lang}/{v}' , 'ProductController@map_ads_last_level');
+    
     Route::post('/ads/filter/{lang}/{v}' , 'ProductController@filter');
     Route::get('/ad/max_min_price/{lang}/{v}' , 'ProductController@max_min_price');
 
@@ -220,7 +223,8 @@ use Illuminate\Http\Request;
 
     //visitor
     Route::post('/visitor/create/{lang}/{v}' , 'VisitorController@create')->middleware('checkguest');
-
+    Route::put('/visitor/update-city/{lang}/{v}' , 'VisitorController@updateCity');
+    
 
     Route::get('/ad/cities/{lang}/{v}' , 'ProductController@cities');
 Route::get('/ad/areas/{city_id}/{lang}/{v}' , 'ProductController@areas');

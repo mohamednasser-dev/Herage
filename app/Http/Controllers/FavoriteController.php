@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Helpers\APIHelpers;
 use App\Favorite;
 use App\Product;
+use App\Setting;
 
 
 class FavoriteController extends Controller
@@ -126,9 +127,10 @@ class FavoriteController extends Controller
                     $products[$i]['Product']->favorite = false;
                     $products[$i]['Product']->conversation_id = 0;
                 }
-                $products[$i]['Product']->time = APIHelpers::get_month_day( $products[$i]['Product']->created_at , $lang);
+                $products[$i]['Product']->time = $products[$i]['Product']->created_at->diffForHumans();
             }
-            $response = APIHelpers::createApiResponse(false, 200, '', '', $products, $request->lang);
+            $show_views = Setting::where('id', 1)->select('show_views')->first()['show_views'];
+            $response = APIHelpers::createApiResponse(false, 200, '', '', ['products' => $products, 'show_views' => $show_views], $request->lang);
             return response()->json($response, 200);
         }
     }

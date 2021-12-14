@@ -340,6 +340,12 @@
         "product_images" => "Product Images",
         "show_buy" => "Show Buy Button",
         "category_has_products_add" => "Category has products .. you can not add sub categories",
+        "show_views" => "Show views",
+        "ignore_review" => "Ignore review products",
+        "reviewed_successfully" => "Reviewed successfully",
+        "show_ad" => "Show ad",
+        "showed" => "Showed",
+        "color" => "Color"
 
     ];
 ?>

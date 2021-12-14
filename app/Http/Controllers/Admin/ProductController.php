@@ -32,6 +32,15 @@ class ProductController extends AdminController
         return view('admin.products.products', ['data' => $data]);
     }
 
+    // review product
+    public function reviewProduct(Product $product) {
+        $product->reviewed = 1;
+        $product->save();
+
+        return redirect()->back()
+        ->with('success', __('messages.reviewed_successfully'));
+    }
+
 
     public function offers()
     {
@@ -495,11 +504,13 @@ class ProductController extends AdminController
         $data = Product_comment::where('status','new')->orderBy('id', 'desc')->get();
         return view('admin.products.products_comments',compact('data'));
     }
+    
     public function product_comments($id)
     {
         $data = Product_comment::where('product_id',$id)->orderBy('id', 'desc')->get();
         return view('admin.products.products_comments',compact('data'));
     }
+    
     public function comment_approval($type,$id)
     {
         $status_data['status'] = $type ;

@@ -33,6 +33,12 @@
                 <label for="plan_price">{{ __('messages.name_en') }}</label>
                 <input required type="text" value="{{$data->title_en}}"  name="title_en" class="form-control" >
             </div>
+            @if ($data->category->category_id == 7)
+            <div class="form-group mb-4">
+                <label for="exampleColorInput" class="form-label">{{ __('messages.color') }}</label>
+                <input type="color" class="form-control form-control-color" id="exampleColorInput" value="{{$data->color}}" name="color" title="Choose your color">
+            </div>
+            @endif
             <input type="submit" value="{{ __('messages.edit') }}" class="btn btn-primary">
         </form>
     </div>

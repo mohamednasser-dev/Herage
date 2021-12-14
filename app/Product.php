@@ -11,13 +11,17 @@ class Product extends Model
     protected $fillable = ['title','description', 'price','category_id','sub_category_id','sub_category_two_id','expire_special_date',
         'sub_category_three_id','sub_category_four_id','user_id', 'type','publication_date','re_post_date','is_special',
         'views', 'offer', 'status', 'expiry_date','main_image','expire_pin_date','created_at','plan_id','publish','pin',
-        'sub_category_five_id','choose_it','city_id','area_id','latitude','longitude','share_location','deleted','retweet_date','retweet'];
+        'sub_category_five_id','choose_it','city_id','area_id','latitude','longitude','share_location','deleted','retweet_date','retweet', 'reviewed'];
     public function category() {
         return $this->belongsTo('App\Category', 'category_id');
     }
     public function Sub_category() {
 
         return $this->belongsTo('App\SubCategory', 'sub_category_id')->select('id','title_'.session('api_lang').' as title');
+    }
+    public function Sub_two_category() {
+
+        return $this->belongsTo('App\SubTwoCategory', 'sub_category_two_id')->select('id','title_'.session('api_lang').' as title');
     }
     public function user() {
         return $this->belongsTo('App\User', 'user_id');

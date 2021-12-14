@@ -13,6 +13,6 @@ class Favorite extends Model
     }
     public function Product() {
         return $this->belongsTo('App\Product', 'product_id')->with('Publisher')
-            ->select('id','title','main_image','user_id','price','description','created_at','city_id','area_id');
+            ->select('id','title','main_image','user_id','price','description','created_at','city_id','area_id', 'views');
     }
 }
