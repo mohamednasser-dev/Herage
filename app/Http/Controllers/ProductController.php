@@ -706,7 +706,7 @@ class ProductController extends Controller
             if ($products[$i]['price'] == 0) {
                 $products[$i]['show_price'] = false;
             } 
-            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             $products[$i]['color'] = '';
             if ($products[$i]->Sub_two_category) {
                 $products[$i]['color'] = $products[$i]->Sub_two_category->color;

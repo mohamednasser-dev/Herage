@@ -773,7 +773,7 @@ class CategoryController extends Controller
             } else {
                 $products[$i]['address'] = $products[$i]['City']->title_en . ' , ' . $products[$i]['Area']->title_en;
             }
-            $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
+            $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             
             $user = auth()->user();
             if ($user) {
