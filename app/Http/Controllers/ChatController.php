@@ -224,7 +224,7 @@ class ChatController extends Controller
             $days = Message::where('ad_product_id', $request->id)
                 ->where('conversation_id', $request->conversation_id)
                 ->select('id', 'message', 'type', 'user_id', 'conversation_id', 'ad_product_id', 'created_at')
-                ->orderBy('created_at', 'desc')
+                ->orderBy('created_at', 'asc')
                 ->get()
                 ->map(function ($messages) use ($user_id) {
                     $messages->time = $messages->created_at->format('g:i a');
