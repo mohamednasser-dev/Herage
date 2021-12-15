@@ -166,6 +166,10 @@ class ProductController extends Controller
         $data = Product::with('Product_user')->with('Area_name')
             ->select('id', 'title', 'main_image', 'description', 'price', 'type', 'publication_date as date', 'user_id', 'category_id', 'latitude', 'longitude', 'share_location', 'area_id', 'views')
             ->find($request->id);
+        $data['show_price'] = true;
+        if ($data['price'] == 0) {
+            $data['show_price'] = false;
+        } 
         $data->price = number_format((float)($data->price), 3);
         $data->comments_count = Product_comment::where('product_id', $request->id)
             ->orderBy('created_at', 'desc')
@@ -584,6 +588,10 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()->makeHidden(['City','Area', 'Sub_two_category']);
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             $products[$i]['color'] = '';
             if ($products[$i]->Sub_two_category) {
                 $products[$i]['color'] = $products[$i]->Sub_two_category->color;
@@ -638,6 +646,10 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()->makeHidden(['City','Area', 'Sub_two_category']);
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             $products[$i]['color'] = '';
             if ($products[$i]->Sub_two_category) {
                 $products[$i]['color'] = $products[$i]->Sub_two_category->color;
@@ -688,6 +700,10 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()->makeHidden(['City','Area', 'Sub_two_category']);
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             $products[$i]['color'] = '';
             if ($products[$i]->Sub_two_category) {
                 $products[$i]['color'] = $products[$i]->Sub_two_category->color;
@@ -763,6 +779,10 @@ class ProductController extends Controller
             ->simplePaginate(12);
             
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
@@ -1368,6 +1388,10 @@ class ProductController extends Controller
 //            ->simplePaginate(12);
 
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['Product']->price == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             if($lang == 'ar'){
                 $products[$i]['Product']->address = $products[$i]['Product']->City->title_ar .' , '.$products[$i]['Product']->Area->title_ar;
             }else{

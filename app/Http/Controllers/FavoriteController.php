@@ -103,6 +103,10 @@ class FavoriteController extends Controller
 //                }
 //            }
             for ($i = 0; $i < count($products); $i++) {
+                $products[$i]['show_price'] = true;
+                if ($products[$i]['price'] == 0) {
+                    $products[$i]['show_price'] = false;
+                } 
                 if($lang == 'ar'){
                     $products[$i]['Product']->address = $products[$i]['Product']->City->title_ar .' , '.$products[$i]['Product']->Area->title_ar;
                 }else{

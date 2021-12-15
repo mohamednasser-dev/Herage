@@ -700,7 +700,10 @@ class UserController extends Controller
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
-
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             if ($products[$i]['retweet_date'] < Carbon::now()) {
                 $products[$i]['retweet'] = 1;
             }

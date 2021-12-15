@@ -180,6 +180,10 @@ class CategoryController extends Controller
         $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
             
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             if($lang == 'ar'){
                 $products[$i]['address'] = $products[$i]['City']->title_ar;
             }else{
@@ -279,6 +283,10 @@ class CategoryController extends Controller
         }
         $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             if($lang == 'ar'){
                 $products[$i]['address'] = $products[$i]['City']->title_ar;
             }else{
@@ -399,6 +407,10 @@ class CategoryController extends Controller
         $products = $products->orderBy('created_at', 'desc')->simplePaginate(12);
         $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar;
             } else {
@@ -525,6 +537,10 @@ class CategoryController extends Controller
             ->orderBy('created_at', 'desc')->simplePaginate(12);
         $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar;
             } else {
@@ -642,6 +658,10 @@ class CategoryController extends Controller
             ->orderBy('created_at', 'desc')->simplePaginate(12);
         $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar;
             } else {
@@ -744,6 +764,10 @@ class CategoryController extends Controller
             ->where('publish', 'Y')->orderBy('created_at', 'desc')->simplePaginate(12);
         $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
             } else {

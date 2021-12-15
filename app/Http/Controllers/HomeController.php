@@ -168,6 +168,10 @@ class HomeController extends Controller
             
 
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar;
             } else {
@@ -260,6 +264,10 @@ class HomeController extends Controller
                             ->simplePaginate(12);
         $data['show_views'] = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         for ($i = 0; $i < count($products); $i++) {
+            $products[$i]['show_price'] = true;
+            if ($products[$i]['price'] == 0) {
+                $products[$i]['show_price'] = false;
+            } 
             $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             if($lang == 'ar'){
                 $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
