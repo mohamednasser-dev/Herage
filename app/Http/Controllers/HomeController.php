@@ -124,7 +124,7 @@ class HomeController extends Controller
             return response()->json($response , 406);
         }
         $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
-        $ads = Ad::where('city_id', $visitor->city_id)->select('id', 'image', 'type', 'content')->where('place', 1)->get();
+        // $ads = Ad::where('city_id', $visitor->city_id)->select('id', 'image', 'type', 'content')->where('place', 1)->get();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         $user = auth()->user();
