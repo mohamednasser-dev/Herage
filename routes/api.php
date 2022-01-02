@@ -81,6 +81,7 @@ use Illuminate\Http\Request;
         Route::get('all_comments/{id}/{lang}/{v}' , 'ProductController@all_comments')->middleware('checkguest');
         Route::post('details/make_report/{lang}/{v}' , 'ProductController@make_report')->middleware('checkguest');
         Route::post('details/make_comment/{lang}/{v}' , 'ProductController@make_comment')->middleware('checkguest');
+        Route::post('comment/report/{lang}/{v}' , 'ProductController@createCommentReport');
     });
 
     // offers

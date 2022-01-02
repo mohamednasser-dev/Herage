@@ -233,10 +233,14 @@ Route::group(['middleware'=>'language','prefix' => "admin-panel",'namespace' => 
         Route::post('update/offer/baner', 'ProductController@update_baner')->name("update.offer.baner");
         Route::post('update/offer/english/baner', 'ProductController@update_baner_english')->name("update.offer.baner_english");
         Route::get('review/{product}', 'ProductController@reviewProduct')->name("products.review");
-        
+        Route::get('republish' , 'ProductController@republishAds')->name('republish.ads');
         Route::get('show', 'ProductController@show')->name("products.index");
         Route::get('reports', 'ProductController@reports')->name("products.reports");
         Route::get('comments', 'ProductController@comments')->name("products.comments");
+        Route::post('comments/reject', 'ProductController@rejectComment')->name("products.comments.reject");
+        
+        Route::get('comments/reports/{comment}', 'ProductController@commentsReports')->name("products.comments.reports");
+        
         Route::get('product_comments/{id}', 'ProductController@product_comments')->name("product.comments");
         Route::get('comments/approval/{type}/{id}', 'ProductController@comment_approval')->name("comment.approve");
         Route::get('add' , 'ProductController@AddGet');

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Helpers\APIHelpers;
 use App\Visitor;
+use Carbon\Carbon;
 
 class VisitorController extends Controller
 {
@@ -48,6 +49,11 @@ class VisitorController extends Controller
             $visitor->type = $request->type;
             $visitor->save();
         }
+        if ($visitor->user) {
+            $visitor->user->updated_at = date('Y-m-d G:i:s');
+            $visitor->user->save();
+        }
+        
 
 
         $response = APIHelpers::createApiResponse(false , 200 , '' , '' , $visitor , $request->lang);

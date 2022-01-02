@@ -4,6 +4,12 @@
 
 
         'reports' => "reports",
+        "report" => "Report",
+        "ad_republished" => "Ad Has Republished",
+        "All_republished" => "All Ads Have republished",
+        "published" => "Published",
+        "unarchive_all" => "Unarchive All",
+        "unarchive" => "Unarchive",
         'expier_days' => "Advertisement expiry days",
         'specialties' => "Specialties",
         'reporter_name' => "Author's name",
@@ -345,7 +351,9 @@
         "reviewed_successfully" => "Reviewed successfully",
         "show_ad" => "Show ad",
         "showed" => "Showed",
-        "color" => "Color"
+        "color" => "Color",
+        "comment_deleted" => "Comment deleted successfully",
+        "comment_published" => "Comment published successfully"
 
     ];
 ?>

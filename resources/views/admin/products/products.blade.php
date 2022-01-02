@@ -19,6 +19,7 @@
                         @else
                             <h4>{{ __('messages.show_products') }}</h4>
                         @endif
+                        <a onclick="return confirm('{{ __('messages.are_you_sure') }}');" href="{{ route('republish.ads') }}" class="btn btn-danger"><i class="far fa-window-restore"></i> {{ __('messages.unarchive_all') }}</a>
                     </div>
                 </div>
             </div>
@@ -32,6 +33,7 @@
                             <th class="text-center">{{ __('messages.product_name') }}</th>
                             <th class="text-center">{{ __('messages.user') }}</th>
                             <th class="text-center">{{ __('messages.show_ad') }}</th>
+                            <th class="text-center">{{ __('messages.archived_or_not') }}</th>
                             <th class="text-center">{{ __('messages.details') }}</th>
                             <th class="text-center">{{ __('messages.comments') }}</th>
                             @if(Auth::user()->delete_data)
@@ -62,6 +64,12 @@
                                     @else
                                     {{ __('messages.showed') }}
                                     @endif 
+                                </td>
+                                <td class="text-center blue-color">
+                                    {{ $product->publish == 'Y' ? __('messages.published') : __('messages.archived') }} 
+                                    @if($product->publish == 'N')
+                                    <a onclick="return confirm('{{ __('messages.are_you_sure') }}');" href="{{ route('republish.ads', ['ad_id' => $product->id]) }}" class="btn btn-danger"><i class="far fa-window-restore"></i> {{ __('messages.unarchive') }}</a>
+                                    @endif
                                 </td>
                                 <td class="text-center blue-color">
                                     <a href="{{ route('products.details', $product->id) }}"><i class="far fa-eye"></i></a>

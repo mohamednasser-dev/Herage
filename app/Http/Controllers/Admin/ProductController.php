@@ -484,6 +484,25 @@ class ProductController extends AdminController
         return back();
     }
 
+    // comments reports
+    public function commentsReports(Product_comment $comment) {
+        $data = $comment;
+        return view('admin.products.comment_reports',compact('data'));
+    }
+
+    // reject comment
+    public function rejectComment(Request $request) {
+        $comment = Product_comment::where('id', $request->id)->first();
+        // dd($request->id);
+        $comment->update(['status' => $request->status]);
+
+        if($request->status == 'rejected'){
+            return 1;
+        }else{
+            return 2;
+        }
+    }
+
     public function update_publish(Request $request){
 
         $report =  Product_report::find($request->id);
@@ -521,6 +540,35 @@ class ProductController extends AdminController
             session()->flash('success', trans('messages.rejected_done'));
         }
         return back();
+    }
+
+    // republish ads
+    public function republishAds(Request $request) {
+        $ad_period = Setting::find(1)['expier_days'];
+        if (isset($request->ad_id)) {
+            $ad = Product::where('id', $request->ad_id)->select('id', 'expiry_date', 'status', 'publish')->first();
+
+            $ad['expiry_date'] = Date('Y-m-d H:i:s', strtotime('+'.$ad_period.' days'));
+            $ad['status'] = 1;
+            $ad['publish'] = 'Y';
+
+            $ad->save();
+            session()->flash('success', trans('messages.ad_republished'));
+        }else {
+            $ads = Product::where('deleted', 0)->where('publish', 'N')->where('reviewed', 1)->select('id', 'expiry_date', 'status')->get();
+
+            if (count($ads) > 0) {
+                for ($i = 0; $i < count($ads); $i ++) {
+                    $ads[$i]['expiry_date'] = Date('Y-m-d H:i:s', strtotime('+'.$ad_period.' days'));
+                    $ads[$i]['status'] = 1;
+                    $ads[$i]['publish'] = 'Y';
+                    $ads[$i]->save();
+                }
+            }
+            session()->flash('success', trans('messages.All_republished'));
+        }
+
+        return redirect()->back();
     }
 
 }

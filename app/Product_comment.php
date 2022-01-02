@@ -15,4 +15,8 @@ class Product_comment extends Model
     public function User() {
         return $this->belongsTo('App\User', 'user_id')->select('id','name');
     }
+
+    public function reports() {
+        return $this->hasMany('App\CommentReport', 'comment_id');
+    }
 }

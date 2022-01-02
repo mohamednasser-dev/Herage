@@ -196,7 +196,7 @@ class HomeController extends Controller
                 $products[$i]['favorite'] = false;
                 $products[$i]['conversation_id'] = 0;
             }
-            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans(['long' => true, 'parts' => 2, 'join' => ' و ']);
         }
 
         $new_ad = [];
@@ -293,7 +293,7 @@ class HomeController extends Controller
                 $products[$i]['favorite'] = false;
                 $products[$i]['conversation_id'] = 0;
             }
-            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans(['long' => true, 'parts' => 2, 'join' => ' و ']);
         }
         $data['products'] = $products;
         $response = APIHelpers::createApiResponse(false, 200, '', '', $data, $request->lang);

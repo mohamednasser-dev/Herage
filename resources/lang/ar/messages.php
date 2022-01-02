@@ -6,6 +6,12 @@ return [
 
 
     'reports_resons' => "اسباب البلاغات",
+    "report" => "البلاغ",
+    "ad_republished" => "تم إعادة نشر الإعلان",
+    "All_republished" => "جميع الإعلانات تم إعادة نشرها",
+    "published" => "منشور",
+    "unarchive_all" => "إلغاء أرشفة الكل",
+    "unarchive" => "إلغاء الأرشفة",
     'reported' => "البلاغ",
     'reports' => "البلاغات",
     'expier_days' => "عدد أيام انتهاء الاعلان",
@@ -339,6 +345,8 @@ return [
     "reviewed_successfully" => "تم الموافقة على الإعلان",
     "show_ad" => "إظهار الإعلان",
     "showed" => "مرئى",
-    "color" => "اللون"
+    "color" => "اللون",
+    "comment_deleted" => "تم حذف التعليق",
+    "comment_published" => "تم نشر التعليق"
 ];
 ?>

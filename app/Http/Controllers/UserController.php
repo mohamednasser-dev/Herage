@@ -98,9 +98,9 @@ class UserController extends Controller
 
         $data = Product::find($ad_id);
         if ($data) {
-            if ($data->retweet == 0) {
-
-
+            $retweetDate = new Carbon($data['retweet_date']);
+            // dd(!$retweetDate->isToday());
+            if ((!$retweetDate->isToday()) && ($retweetDate->addDay() >= $data['retweet_date'])) {
                 //create expier day
                 $settings = Setting::find(1);
                 $mytime = Carbon::now();
@@ -112,6 +112,7 @@ class UserController extends Controller
                 $data->created_at = $mytime;
                 $data->status = 1;
                 $data->retweet = 1;
+                $data->retweet_date = Carbon::now();
                 $data->save();
 
                 $response = APIHelpers::createApiResponse(false, 200, 'retweet used successfully', 'تم استخدام الريتويت بنجاح', $data, $lang);
@@ -672,9 +673,9 @@ class UserController extends Controller
         Session::put('api_lang', $lang);
         $data['personal_data'] = User::with('City')->with('Area')->with('Account_type')
             ->where('id', $user->id)
-            ->select('id', 'name', 'email', 'about_user', 'image', 'cover', 'phone', 'watsapp', 'city_id', 'area_id', 'account_type', 'created_at')
+            ->select('id', 'name', 'email', 'about_user', 'image', 'cover', 'phone', 'watsapp', 'city_id', 'area_id', 'account_type', 'created_at', 'updated_at')
             ->first();
-
+        $data['personal_data']->last_seen = $data['personal_data']->updated_at->diffForHumans();
         $user_specialties = User_specialty::with('Specialty')
             ->select('special_id')
             ->where('user_id', $user->id)->get();
@@ -704,8 +705,11 @@ class UserController extends Controller
             if ($products[$i]['price'] == 0) {
                 $products[$i]['show_price'] = false;
             } 
-            if ($products[$i]['retweet_date'] < Carbon::now()) {
+            $retweetDate = new Carbon($products[$i]['retweet_date']);
+            if ((!$retweetDate->isToday()) && ($retweetDate->addDay() >= $products[$i]['retweet_date'])) {
                 $products[$i]['retweet'] = 1;
+            }else {
+                $products[$i]['retweet'] = 0;
             }
             if ($lang == 'ar') {
                 $products[$i]['address'] = $products[$i]['City']->title_ar . ' , ' . $products[$i]['Area']->title_ar;
@@ -741,9 +745,11 @@ class UserController extends Controller
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($current_products); $i++) {
-
-            if ($current_products[$i]['retweet_date'] < Carbon::now()) {
+            $retweetDate = new Carbon($current_products[$i]['retweet_date']);
+            if ((!$retweetDate->isToday()) && ($retweetDate->addDay() >= $current_products[$i]['retweet_date'])) {
                 $current_products[$i]['retweet'] = 1;
+            }else {
+                $current_products[$i]['retweet'] = 0;
             }
 
             if ($lang == 'ar') {
@@ -776,6 +782,7 @@ class UserController extends Controller
         $data['current_ads'] = $current_products;
         $data['personal_data']->current_ads_count = $data['current_ads']->count();
         $data['personal_data']->end_ads_count = $data['ended_ads']->count();
+
         $response = APIHelpers::createApiResponse(false, 200, '', '', $data, $request->lang);
         return response()->json($response, 200);
     }

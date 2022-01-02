@@ -34,6 +34,9 @@ use App\User;
 use App\Plan;
 use App\City;
 use App\Area;
+use App\CommentReport;
+use App\Visitor;
+use Throwable;
 
 class ProductController extends Controller
 {
@@ -152,6 +155,7 @@ class ProductController extends Controller
         $comments = Product_comment::with('User')
             ->select('id', 'user_id', 'comment')
             ->where('product_id', $id)
+            ->where('status', '!=', 'rejected')
             ->orderBy('created_at', 'desc')
             ->get();
         $response = APIHelpers::createApiResponse(false, 200, '', '', $comments, $request->lang);
@@ -164,7 +168,7 @@ class ProductController extends Controller
         Session::put('api_lang', $lang);
         Session::put('lang', $lang);
         $data = Product::with('Product_user')->with('Area_name')
-            ->select('id', 'title', 'main_image', 'description', 'price', 'type', 'publication_date as date', 'user_id', 'category_id', 'latitude', 'longitude', 'share_location', 'area_id', 'views')
+            ->select('id', 'title', 'main_image', 'description', 'price', 'type', 'publication_date as date', 'user_id', 'category_id', 'latitude', 'longitude', 'share_location', 'area_id', 'views', 'prevent_comments')
             ->find($request->id);
         $data['show_price'] = true;
         if ($data['price'] == 0) {
@@ -172,9 +176,10 @@ class ProductController extends Controller
         } 
         $data->price = number_format((float)($data->price), 3);
         $data->comments_count = Product_comment::where('product_id', $request->id)
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->count();
+        ->where('status', '!=', 'rejected')
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->count();
 
         if ($data->share_location == '0') {
             $data->share_location = 0;
@@ -252,7 +257,7 @@ class ProductController extends Controller
         $images[count($images)] = $data->main_image;
         $data->images = $images;
 
-        $comments = Product_comment::with('User')->select('id', 'user_id', 'comment')->where('product_id', $data->id)->orderBy('created_at', 'desc')->limit(3)->get();
+        $comments = Product_comment::with('User')->select('id', 'user_id', 'comment')->where('status', '!=', 'rejected')->where('product_id', $data->id)->orderBy('created_at', 'desc')->limit(3)->get();
 
 
         $related = Product::where('category_id', $data->category_id)
@@ -616,7 +621,7 @@ class ProductController extends Controller
             } else {
                 $products[$i]['favorite'] = false;
             }
-            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans(['long' => true, 'parts' => 2, 'join' => ' و ']);
         }
         $show_views = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         $response = APIHelpers::createApiResponse(false, 200, '', '',array('categories'=>$categories , 'products'=>$products, 'show_views' => $show_views ) , $request->lang);
@@ -675,7 +680,7 @@ class ProductController extends Controller
             } else {
                 $products[$i]['favorite'] = false;
             }
-            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans(['long' => true, 'parts' => 2, 'join' => ' و ']);
         }
         $show_views = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         $response = APIHelpers::createApiResponse(false, 200, '', '',array('categories'=>$categories , 'products'=>$products, 'show_views' => $show_views ) , $request->lang);
@@ -730,7 +735,7 @@ class ProductController extends Controller
             } else {
                 $products[$i]['favorite'] = false;
             }
-            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans();
+            $products[$i]['time'] = $products[$i]['created_at']->diffForHumans(['long' => true, 'parts' => 2, 'join' => ' و ']);
         }
         $show_views = Setting::where('id', 1)->select('show_views')->first()['show_views'];
         $response = APIHelpers::createApiResponse(false, 200, '', '',array('categories'=>$categories , 'products'=>$products, 'show_views' => $show_views ) , $request->lang);
@@ -925,7 +930,11 @@ class ProductController extends Controller
                 //to make retweet date
                 $final_retweet_date_date = $final_retweet_date->addDays(1);
                 $input['retweet_date'] = $final_retweet_date_date;
-
+                $preventComments = 0; 
+                if ($request->prevent_comments) {
+                    $preventComments = $request->prevent_comments;
+                }
+                $input['prevent_comments'] = $preventComments;
                 $ad_data = Product::create($input);
 
                 //save product feature ...
@@ -1787,6 +1796,11 @@ class ProductController extends Controller
             unset($input['images']);
             unset($input['options']);
             unset($input['ios']);
+            $preventComments = 0; 
+            if ($request->prevent_comments) {
+                $preventComments = $request->prevent_comments;
+            }
+            $input['prevent_comments'] = $preventComments;
             $updated = Product::where('id', $id)->update($input);
             if ($request->options != null) {
                 Product_feature::where('product_id', $id)->delete();
@@ -1903,16 +1917,61 @@ class ProductController extends Controller
             $response = APIHelpers::createApiResponse(true, 406, $validator->errors()->first(), $validator->errors()->first(), null, $request->lang);
             return response()->json($response, 406);
         }
+
         $comment = new Product_comment();
         $comment->comment = $request->comment;
         $comment->user_id = $user->id;
         $comment->product_id = $request->product_id;
         $comment->save();
+        $product = Product::where('id', $request->product_id)->select('id', 'user_id', 'title')->first();
+        $lastToken = Visitor::where('user_id', $product->user_id)->where('fcm_token' ,'!=' , null)->latest('updated_at')->select('fcm_token')->first();
+        
+        $title = "Herag";
+        $body = $user->name . " has added a new comment on your ad " . $product->title;
+        if ($request->lang == 'ar') {
+            $title = "حراج";
+            $body = $user->name . " قام بإضافة تعليق جديد على إعلانك " . $product->title;
+        }
+        if ($lastToken) {
+            $notificationss = APIHelpers::send_notification($title , $body , "", null , [$lastToken->fcm_token]);
+        }
+        
 
         $response = APIHelpers::createApiResponse(false, 200, 'commented successfully', 'تم التعليق بنجاح', $comment, $request->lang);
         return response()->json($response, 200);
-
     }
 
+    // craete report
+    public function createCommentReport(Request $request) {
+        $user_id = auth()->user()->id;
+        $post = $request->all();
+        $post['user_id'] = $user_id;
+        $commentIdRequired = "comment id is required field";
+        $productIdRequired = "Product id is required field";
+        $reportRequired = "Report is required field";
+        if ($request->lang == 'ar') {
+            $reportRequired = "البلاغ حقل مطلوب";
+        }
+        $messages = [
+            "comment_id.required" => $commentIdRequired,
+            "report.required" => $reportRequired,
+            "product_id.required" => $productIdRequired
+        ];
+        $validator = Validator::make($request->all(), [
+            'comment_id' => 'required',
+            'product_id' => 'required',
+            "report" => 'required'
+        ], $messages);
+
+        if ($validator->fails()) {
+            $response = APIHelpers::createApiResponse(true , 406 , $validator->messages()->first() , $validator->messages()->first()  , null , $request->lang);
+            return response()->json($response , 406);
+        }
+
+        CommentReport::create($post);
+
+        $response = APIHelpers::createApiResponse(false, 200, 'reported successfully', 'تم إرسال البلاغ بنجاح', (object)[], $request->lang);
+        return response()->json($response, 200);
+    }
 
 }
