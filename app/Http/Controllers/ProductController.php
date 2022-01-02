@@ -372,8 +372,8 @@ class ProductController extends Controller
         $user = auth()->user();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
-        $basic_info = User::with('Account_type')->select('id', 'name', 'cover', 'email', 'image','account_type', 'phone', 'city_id', 'area_id', 'about_user', 'created_at as join_date')->where('id', $id)->first()->makeHidden(['city_id', 'area_id', 'City', 'Area']);
-
+        $basic_info = User::with('Account_type')->select('id', 'name', 'cover', 'email', 'image','account_type', 'phone', 'city_id', 'area_id', 'about_user', 'created_at as join_date', 'updated_at')->where('id', $id)->first()->makeHidden(['city_id', 'area_id', 'City', 'Area']);
+        $basic_info->last_seen = $basic_info->updated_at->diffForHumans();
         if ($basic_info->city_id != null && $basic_info->area_id != null) {
             $basic_info->address = $basic_info->City->title_ar . ' , ' . $basic_info->Area->title_ar;
         } else {
