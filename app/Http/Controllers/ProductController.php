@@ -218,7 +218,7 @@ class ProductController extends Controller
         $features = Product_feature::where('product_id', $request->id)
             ->select('id', 'type', 'product_id', 'target_id', 'option_id')
             ->get();
-        $feature_data = null;
+        $feature_data = [];
         foreach ($features as $key => $feature) {
             $feature_data[$key]['image'] = $feature->Option->image;
             if ($feature->type == 'manual') {
