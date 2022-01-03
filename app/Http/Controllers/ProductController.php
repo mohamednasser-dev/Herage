@@ -168,8 +168,14 @@ class ProductController extends Controller
         Session::put('api_lang', $lang);
         Session::put('lang', $lang);
         $data = Product::with('Product_user')->with('Area_name')
-            ->select('id', 'title', 'main_image', 'description', 'price', 'type', 'publication_date as date', 'user_id', 'category_id', 'latitude', 'longitude', 'share_location', 'area_id', 'views', 'prevent_comments')
+            ->select('id', 'title', 'main_image', 'description', 'price', 'type', 'publication_date as date', 'user_id', 'category_id', 'latitude', 'longitude', 'share_location', 'area_id', 'views', 'prevent_comments', 'retweet_date', 'retweet')
             ->find($request->id);
+        $retweetDate = new Carbon($data->retweet_date);
+        if ((!$retweetDate->isToday()) && ($retweetDate->addDay() >= $data['retweet_date'])) {
+            $data->retweet = 1;
+        }else {
+            $data->retweet = 0;
+        }
         $data['show_price'] = true;
         if ($data['price'] == 0) {
             $data['show_price'] = false;

@@ -99,7 +99,7 @@ class UserController extends Controller
         $data = Product::find($ad_id);
         if ($data) {
             $retweetDate = new Carbon($data['retweet_date']);
-            // dd(!$retweetDate->isToday());
+            
             if ((!$retweetDate->isToday()) && ($retweetDate->addDay() >= $data['retweet_date'])) {
                 //create expier day
                 $settings = Setting::find(1);
