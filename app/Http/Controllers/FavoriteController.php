@@ -32,7 +32,7 @@ class FavoriteController extends Controller
             $response = APIHelpers::createApiResponse(true , 406 ,  'بعض الحقول مفقودة', 'بعض الحقول مفقودة' , null, $request->lang );
             return response()->json($response , 406);
         }
-        $favorite = Favorite::where('product_id' , $request->product_id)->where('fcm_token' ,'!=' , null)->where('user_id' , $user->id)->first();
+        $favorite = Favorite::where('product_id' , $request->product_id)->where('user_id' , $user->id)->first();
         if($favorite){
             $response = APIHelpers::createApiResponse(true , 406 ,  'تم إضافه هذا المنتج للمفضله من قبل', 'تم إضافه هذا المنتج للمفضله من قبل' , null, $request->lang );
             return response()->json($response , 406);
@@ -42,7 +42,7 @@ class FavoriteController extends Controller
             $favorite->product_id = $request->product_id;
             $favorite->save();
             $product = Product::where("id", $request->product_id)->select('id', 'user_id', 'title')->first();
-            $lastToken = Visitor::where('user_id', $product->user_id)->latest('updated_at')->select('fcm_token')->first();
+            $lastToken = Visitor::where('user_id', $product->user_id)->where('fcm_token' ,'!=' , null)->latest('updated_at')->select('fcm_token')->first();
             
             $title = "Herag";
             $body = $user->name . " has added your ad " . $product->title . " to favorite list";
