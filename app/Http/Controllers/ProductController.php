@@ -1558,7 +1558,7 @@ class ProductController extends Controller
         $data['ad'] = Product::where('id', $id)
             ->with('City_api')
             ->with('Area_api')
-            ->select('id', 'category_id', 'sub_category_id', 'sub_category_two_id', 'sub_category_three_id', 'sub_category_four_id', 'sub_category_five_id', 'title', 'price', 'description', 'main_image', 'city_id', 'area_id', 'share_location', 'latitude', 'longitude')
+            ->select('id', 'category_id', 'sub_category_id', 'sub_category_two_id', 'sub_category_three_id', 'sub_category_four_id', 'sub_category_five_id', 'title', 'price', 'description', 'main_image', 'city_id', 'area_id', 'share_location', 'latitude', 'longitude', 'prevent_comments')
             ->first();
         if ($data['ad']['sub_category_id'] == null) {
             $data['ad']['sub_category_id'] = 0;
