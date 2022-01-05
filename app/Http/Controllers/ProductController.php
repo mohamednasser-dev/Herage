@@ -201,7 +201,7 @@ class ProductController extends Controller
                Product_view::create($data_view);
                $views = Product_view::where('product_id', $data->id)->count();
                 $product = Product::where('id', $request->id)->select('id', 'views')->first();
-                $product->views = $views;
+                $product->views = $product->views + 1;
                 $product->save();
            }
         } else {
@@ -214,7 +214,7 @@ class ProductController extends Controller
                 Product_view::create($data_view);
                 $views = Product_view::where('product_id', $data->id)->count();
                 $product = Product::where('id', $request->id)->select('id', 'views')->first();
-                $product->views = $views;
+                $product->views = $product->views + 1;
                 $product->save();
             } else {
                 $prod_view->user_id = $user->id;
