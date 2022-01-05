@@ -50,9 +50,11 @@ class FavoriteController extends Controller
                 $title = "حراج";
                 $body = $user->name . " قام بإضافة إعلانك " . $product->title . " إلى المفضلة";
             }
+            
             if ($lastToken) {
                 $notificationss = APIHelpers::send_notification($title , $body , "", null , [$lastToken->fcm_token]);
             }
+            
             
             $response = APIHelpers::createApiResponse(false , 200 ,  '', '' , $favorite, $request->lang);
             return response()->json($response , 200);

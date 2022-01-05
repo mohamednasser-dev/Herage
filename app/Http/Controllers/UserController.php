@@ -118,7 +118,7 @@ class UserController extends Controller
                 $response = APIHelpers::createApiResponse(false, 200, 'retweet used successfully', 'تم استخدام الريتويت بنجاح', $data, $lang);
                 return response()->json($response, 200);
             } else {
-                $response = APIHelpers::createApiResponse(true, 406, 'retweet used before', 'تم أستخدام الريتويت من قبل', (object)[], $request->lang);
+                $response = APIHelpers::createApiResponse(true, 406, 'It is not possible to retweet the advertisement before 24 hours have passed', 'لا يمكن عمل إعادة نشر للإعلان قبل مرور 24 ساعة', (object)[], $request->lang);
                 return response()->json($response, 406);
             }
 
