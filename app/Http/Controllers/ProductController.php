@@ -193,34 +193,9 @@ class ProductController extends Controller
             $data->share_location = 1;
         }
         $user_ip_address = $request->ip();
-        if ($user == null) {
-           $prod_view = Product_view::where('ip', $user_ip_address)->where('product_id', $data->id)->first();
-           if ($prod_view == null) {
-               $data_view['ip'] = $user_ip_address;
-               $data_view['product_id'] = $data->id;
-               Product_view::create($data_view);
-               $views = Product_view::where('product_id', $data->id)->count();
-                $product = Product::where('id', $request->id)->select('id', 'views')->first();
-                $product->views = $product->views + 1;
-                $product->save();
-           }
-        } else {
-            $prod_view = Product_view::where('user_id', $user->id)->where('product_id', $data->id)->first();
-            
-            if ($prod_view == null) {
-                $data_view['user_id'] = $user->id;
-                $data_view['ip'] = $user_ip_address;
-                $data_view['product_id'] = $data->id;
-                Product_view::create($data_view);
-                $views = Product_view::where('product_id', $data->id)->count();
-                $product = Product::where('id', $request->id)->select('id', 'views')->first();
-                $product->views = $product->views + 1;
-                $product->save();
-            } else {
-                $prod_view->user_id = $user->id;
-                $prod_view->save();
-            }
-        }
+        $product = Product::where('id', $request->id)->select('id', 'views')->first();
+        $product->views = $product->views + 1;
+        $product->save();
         $features = Product_feature::where('product_id', $request->id)
             ->select('id', 'type', 'product_id', 'target_id', 'option_id')
             ->get();
