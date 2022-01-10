@@ -172,6 +172,7 @@ class ChatController extends Controller
                 if ($message != null) {
                     $conv_data['last_message_id'] = $message->id;
                     Conversation::findOrFail($input['conversation_id'])->update($conv_data);
+                    Participant::where('conversation_id',$input['conversation_id'])->update(['updated_at'=>Carbon::now()]);
                 }
                 //begin use firebase to send message
                 $fb_token = $other_user->User->fcm_token;
