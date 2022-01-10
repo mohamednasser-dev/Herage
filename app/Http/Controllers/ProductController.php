@@ -168,8 +168,9 @@ class ProductController extends Controller
         Session::put('api_lang', $lang);
         Session::put('lang', $lang);
         $data = Product::with('Product_user')->with('Area_name')
-            ->select('id', 'title', 'main_image', 'description', 'price', 'type', 'publication_date as date', 'user_id', 'category_id', 'latitude', 'longitude', 'share_location', 'area_id', 'views', 'prevent_comments', 'retweet_date', 'retweet')
+            ->select('id', 'title', 'main_image', 'description', 'price', 'type', 'publication_date as date', 'user_id', 'category_id', 'latitude', 'longitude', 'share_location', 'area_id', 'views', 'prevent_comments', 'retweet_date', 'retweet','created_at')
             ->find($request->id);
+
         $retweetDate = new Carbon($data->retweet_date);
         if ((!$retweetDate->isToday()) && ($retweetDate->addDay() >= $data['retweet_date'])) {
             $data->retweet = 1;
@@ -179,7 +180,7 @@ class ProductController extends Controller
         $data['show_price'] = true;
         if ($data['price'] == 0) {
             $data['show_price'] = false;
-        } 
+        }
         $data->price = number_format((float)($data->price), 3);
         $data->comments_count = Product_comment::where('product_id', $request->id)
         ->where('status', '!=', 'rejected')
@@ -230,8 +231,8 @@ class ProductController extends Controller
         }
         $date = date_create($data->date);
         $data->date = date_format($date, 'd M Y');
-        $data->time = date_format($date, 'g:i a');
-
+//        $data->time = date_format($date, 'g:i a');
+        $data['time'] = $data['created_at']->diffForHumans(['long' => true, 'parts' => 2, 'join' => ' و ']);
 
         //to get ad images in array
         $images = ProductImage::where('product_id', $data->id)->pluck('image')->toArray();
@@ -502,7 +503,7 @@ class ProductController extends Controller
         if (count($whereIn) > 0 && $model == '\App\SubCategory') {
             $categories = $categories->whereIn('category_id', $whereIn);
         }
-        
+
         $categories = $categories->select('id', 'title_' . $lang . ' as title', 'image')->orderBy('sort', 'asc')->get()->makeHidden(['ViewSubCategories', 'products'])
         ->map(function ($row) use ($baseUrl, $model, $lang) {
             if ($model == '\App\SubCategory') {
@@ -512,11 +513,11 @@ class ProductController extends Controller
             }
             $row->next_level = false;
             $subCategories = $row->ViewSubCategories;
-            
+
             if ($subCategories && count($subCategories) > 0) {
                 $hasProducts = false;
                 for ($n = 0; $n < count($subCategories); $n++) {
-                    
+
                     if ($model != '\App\SubFiveCategory') {
                         if ($subCategories[$n]->products != null && count($subCategories[$n]->products) > 0) {
                             $hasProducts = true;
@@ -550,7 +551,7 @@ class ProductController extends Controller
                 'next_level' => false,
                 'selected' => false
             ];
-            
+
             array_unshift($categories, $all);
         }
 
@@ -563,12 +564,12 @@ class ProductController extends Controller
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         $categories = $this->getCatsSubCats('\App\SubCategory', $lang, $request->root(), 7, true);
-        
+
         $products = Product::where('publish', 'Y')->with('Publisher')->with('Sub_category')
             ->where('deleted', 0)
             ->where('status', 1)
             ->where('category_id',7);
-            
+
             $products = $products->select('id', 'title', 'price','sub_category_id', 'sub_category_two_id', 'main_image as image', 'created_at', 'pin','city_id','area_id', 'user_id','latitude','longitude')
             ->orderBy('pin', 'desc')
             ->orderBy('created_at', 'desc')
@@ -577,13 +578,13 @@ class ProductController extends Controller
             $products[$i]['show_price'] = true;
             if ($products[$i]['price'] == 0) {
                 $products[$i]['show_price'] = false;
-            } 
+            }
             $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $products[$i]['color'] = '';
             if ($products[$i]->Sub_two_category) {
                 $products[$i]['color'] = $products[$i]->Sub_two_category->color;
             }
-            
+
             if($lang == 'ar'){
                 $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
             }else{
@@ -636,13 +637,13 @@ class ProductController extends Controller
             $products[$i]['show_price'] = true;
             if ($products[$i]['price'] == 0) {
                 $products[$i]['show_price'] = false;
-            } 
+            }
             $products[$i]['price'] = number_format((float)($products[$i]['price']), 3);
             $products[$i]['color'] = '';
             if ($products[$i]->Sub_two_category) {
                 $products[$i]['color'] = $products[$i]->Sub_two_category->color;
             }
-            
+
             if($lang == 'ar'){
                 $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
             }else{
@@ -691,13 +692,13 @@ class ProductController extends Controller
             $products[$i]['show_price'] = true;
             if ($products[$i]['price'] == 0) {
                 $products[$i]['show_price'] = false;
-            } 
+            }
             $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             $products[$i]['color'] = '';
             if ($products[$i]->Sub_two_category) {
                 $products[$i]['color'] = $products[$i]->Sub_two_category->color;
             }
-            
+
             if($lang == 'ar'){
                 $products[$i]['address'] = $products[$i]['City']->title_ar .' , '.$products[$i]['Area']->title_ar;
             }else{
@@ -766,12 +767,12 @@ class ProductController extends Controller
             ->orderBy('pin', 'desc')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
-            
+
         for ($i = 0; $i < count($products); $i++) {
             $products[$i]['show_price'] = true;
             if ($products[$i]['price'] == 0) {
                 $products[$i]['show_price'] = false;
-            } 
+            }
             $products[$i]['price'] = number_format((float)$products[$i]['price'], 3, '.', '');
             $views = Product_view::where('product_id', $products[$i]['id'])->get()->count();
             $products[$i]['views'] = $views;
@@ -911,7 +912,7 @@ class ProductController extends Controller
                 //to make retweet date
                 $final_retweet_date_date = $final_retweet_date->addDays(1);
                 $input['retweet_date'] = $final_retweet_date_date;
-                $preventComments = 0; 
+                $preventComments = 0;
                 if ($request->prevent_comments) {
                     $preventComments = $request->prevent_comments;
                 }
@@ -1384,7 +1385,7 @@ class ProductController extends Controller
             $products[$i]['show_price'] = true;
             if ($products[$i]['Product']->price == 0) {
                 $products[$i]['show_price'] = false;
-            } 
+            }
             if($lang == 'ar'){
                 $products[$i]['Product']->address = $products[$i]['Product']->City->title_ar .' , '.$products[$i]['Product']->Area->title_ar;
             }else{
@@ -1777,7 +1778,7 @@ class ProductController extends Controller
             unset($input['images']);
             unset($input['options']);
             unset($input['ios']);
-            $preventComments = 0; 
+            $preventComments = 0;
             if ($request->prevent_comments) {
                 $preventComments = $request->prevent_comments;
             }
@@ -1906,7 +1907,7 @@ class ProductController extends Controller
         $comment->save();
         $product = Product::where('id', $request->product_id)->select('id', 'user_id', 'title')->first();
         $lastToken = Visitor::where('user_id', $product->user_id)->where('fcm_token' ,'!=' , null)->latest('updated_at')->select('fcm_token')->first();
-        
+
         $title = "Herag";
         $body = $user->name . " has added a new comment on your ad " . $product->title;
         if ($request->lang == 'ar') {
@@ -1916,7 +1917,7 @@ class ProductController extends Controller
         if ($lastToken) {
             $notificationss = APIHelpers::send_notification($title , $body , "", null , [$lastToken->fcm_token]);
         }
-        
+
 
         $response = APIHelpers::createApiResponse(false, 200, 'commented successfully', 'تم التعليق بنجاح', $comment, $request->lang);
         return response()->json($response, 200);
