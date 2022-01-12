@@ -188,10 +188,10 @@ class ProductController extends Controller
         ->get()
         ->count();
 
-        if ($data->share_location == '0') {
-            $data->share_location = 0;
+        if ($data->share_location == 0) {
+            $data->share_location = '0';
         } else {
-            $data->share_location = 1;
+            $data->share_location = '1';
         }
         $user_ip_address = $request->ip();
         $product = Product::where('id', $request->id)->select('id', 'views')->first();
@@ -1783,10 +1783,10 @@ class ProductController extends Controller
                 $preventComments = $request->prevent_comments;
             }
             $input['prevent_comments'] = $preventComments;
-            if ($request->share_location == '0') {
-                $input['share_location'] = 0;
+            if ($request->share_location == 0) {
+                $input['share_location'] = '0';
             } else {
-                $input['share_location'] = 1;
+                $input['share_location'] = '1';
             }
             $updated = Product::where('id', $id)->update($input);
             if ($request->options != null) {
