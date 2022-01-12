@@ -154,17 +154,31 @@ class HomeController extends Controller
         }
 
         $data['categories'] = $categories;
-        $products = Product::where('status', 1)
-            ->with('Publisher')
-            ->where('publish', 'Y')
-            ->where('deleted', 0)
-            ->where('reviewed', 1)
-            ->where('city_id',  $visitor->city_id )
-            ->whereIn('category_id', $cat_ids)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
-            ->orderBy('created_at', 'desc')
-            ->get()->makeHidden(['City','Area']);
-            $data['show_views'] = $setting['show_views'];
+        if($visitor->city_id == null){
+            $products = Product::where('status', 1)
+                ->with('Publisher')
+                ->where('publish', 'Y')
+                ->where('deleted', 0)
+                ->where('reviewed', 1)
+                ->whereIn('category_id', $cat_ids)
+                ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
+                ->orderBy('created_at', 'desc')
+                ->get()->makeHidden(['City','Area']);
+                $data['show_views'] = $setting['show_views'];
+        }else{
+           $products = Product::where('status', 1)
+                ->with('Publisher')
+                ->where('publish', 'Y')
+                ->where('deleted', 0)
+                ->where('reviewed', 1)
+                ->where('city_id',  $visitor->city_id )
+                ->whereIn('category_id', $cat_ids)
+                ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
+                ->orderBy('created_at', 'desc')
+                ->get()->makeHidden(['City','Area']);
+                $data['show_views'] = $setting['show_views']; 
+        }
+        
             
 
         for ($i = 0; $i < count($products); $i++) {
