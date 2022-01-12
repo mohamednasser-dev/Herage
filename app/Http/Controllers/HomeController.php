@@ -124,7 +124,6 @@ class HomeController extends Controller
             return response()->json($response , 406);
         }
         $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
-        // $ads = Ad::where('city_id', $visitor->city_id)->select('id', 'image', 'type', 'content')->where('place', 1)->get();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         $user = auth()->user();
@@ -141,18 +140,11 @@ class HomeController extends Controller
             });
             
         }
-        // $categories = Category::where(function ($q) {
-        //     $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-        //         $qq->has('Products', '>', 0);
-        //     });
-        // })->where('deleted', 0)->select('id', 'title_' . $lang . ' as title', 'image')->orderBy('sort', 'asc')->get()->toArray();
-
         for ($i = 0; $i < count($categories); $i++) {
             if ($categories[$i]['id'] != 0) {
                 $cat_ids[$i] = $categories[$i]['id'];
             }
         }
-
         $data['categories'] = $categories;
         if($visitor->city_id == null){
             $products = Product::where('status', 1)
@@ -178,9 +170,6 @@ class HomeController extends Controller
                 ->get()->makeHidden(['City','Area']);
                 $data['show_views'] = $setting['show_views']; 
         }
-        
-            
-
         for ($i = 0; $i < count($products); $i++) {
             $products[$i]['show_price'] = true;
             if ($products[$i]['price'] == 0) {
