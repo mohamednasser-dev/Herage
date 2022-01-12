@@ -1783,6 +1783,11 @@ class ProductController extends Controller
                 $preventComments = $request->prevent_comments;
             }
             $input['prevent_comments'] = $preventComments;
+            if ($request->share_location == '0') {
+                $input['share_location'] = 0;
+            } else {
+                $input['share_location'] = 1;
+            }
             $updated = Product::where('id', $id)->update($input);
             if ($request->options != null) {
                 Product_feature::where('product_id', $id)->delete();
