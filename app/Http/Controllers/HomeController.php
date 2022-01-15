@@ -261,7 +261,7 @@ class HomeController extends Controller
                             ->where('publish', 'Y')
                             ->where('deleted', 0)
                             ->where('reviewed', 1)
-                            ->where('area_id', $area_id)
+                            ->where('city_id', $area_id)
                             ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
                             ->orderBy('created_at', 'desc')
                             ->simplePaginate(12);
