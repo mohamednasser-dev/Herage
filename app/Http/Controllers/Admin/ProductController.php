@@ -28,7 +28,7 @@ class ProductController extends AdminController
     // show
     public function show()
     {
-        $data['products'] = Product::where('deleted', 0)->orderBy('id', 'desc')->get();
+        $data['products'] = Product::where('deleted', 0)->orderBy('created_at', 'desc')->get();
         return view('admin.products.products', ['data' => $data]);
     }
 
@@ -545,9 +545,11 @@ class ProductController extends AdminController
     // republish ads
     public function republishAds(Request $request) {
         $ad_period = Setting::find(1)['expier_days'];
+        $mytime = Carbon::now();
         if (isset($request->ad_id)) {
-            $ad = Product::where('id', $request->ad_id)->select('id', 'expiry_date', 'status', 'publish')->first();
-
+            $ad = Product::where('id', $request->ad_id)->select('id', 'expiry_date', 'status', 'publish', 'created_at')->first();
+            
+            $ad['created_at'] = $mytime;
             $ad['expiry_date'] = Date('Y-m-d H:i:s', strtotime('+'.$ad_period.' days'));
             $ad['status'] = 1;
             $ad['publish'] = 'Y';
@@ -561,6 +563,7 @@ class ProductController extends AdminController
                 for ($i = 0; $i < count($ads); $i ++) {
                     $ads[$i]['expiry_date'] = Date('Y-m-d H:i:s', strtotime('+'.$ad_period.' days'));
                     $ads[$i]['status'] = 1;
+                    $ads[$i]['created_at'] = $mytime;
                     $ads[$i]['publish'] = 'Y';
                     $ads[$i]->save();
                 }

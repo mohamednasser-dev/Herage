@@ -21,7 +21,7 @@ class Product extends Model
     }
     public function Sub_two_category() {
 
-        return $this->belongsTo('App\SubTwoCategory', 'sub_category_two_id')->select('id','color');
+        return $this->belongsTo('App\SubTwoCategory', 'sub_category_two_id');
     }
     public function user() {
         return $this->belongsTo('App\User', 'user_id');

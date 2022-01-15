@@ -644,6 +644,7 @@ class ProductController extends Controller
             $products[$i]['color'] = '';
             if ($products[$i]->Sub_two_category) {
                 $products[$i]['color'] = $products[$i]->Sub_two_category->color;
+                dd($products[$i]->Sub_two_category);
             }
 
             if($lang == 'ar'){

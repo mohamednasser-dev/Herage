@@ -67,9 +67,7 @@
                                 </td>
                                 <td class="text-center blue-color">
                                     {{ $product->publish == 'Y' ? __('messages.published') : __('messages.archived') }} 
-                                    @if($product->publish == 'N')
                                     <a onclick="return confirm('{{ __('messages.are_you_sure') }}');" href="{{ route('republish.ads', ['ad_id' => $product->id]) }}" class="btn btn-danger"><i class="far fa-window-restore"></i> {{ __('messages.unarchive') }}</a>
-                                    @endif
                                 </td>
                                 <td class="text-center blue-color">
                                     <a href="{{ route('products.details', $product->id) }}"><i class="far fa-eye"></i></a>
