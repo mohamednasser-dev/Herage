@@ -36,9 +36,13 @@ class HomeController extends Controller
     }
 
     // get cats - sub cats with next level
-    public function getCatsSubCats($model, $lang, $show=true, $cat_id=0, $all=false, $whereIn=[]) {
-        $categories = $model::has('Products', '>', 0)
-        ->where('deleted', 0);
+    public function getCatsSubCats($model, $lang, $show=true, $cat_id=0, $city_id=0, $all=false, $whereIn=[]) {
+        $categories = $model::has('Products', '>', 0)->where('deleted', 0);
+        if ($city_id != 0) {
+            $categories = $categories->whereHas('Products', function($q) use ($city_id) {
+                $q->where('city_id', $city_id);
+            });
+        }
         if ($model == '\App\SubCategory' && $cat_id != 0) {
             $categories = $categories->where('category_id', $cat_id);
         }elseif ($model != '\App\Category' && $cat_id != 0) {
@@ -129,7 +133,7 @@ class HomeController extends Controller
         $user = auth()->user();
         $cat_ids =[];
         $category = '\App\Category';
-        $categories = $this->getCatsSubCats($category, $lang, true, 0, true);
+        $categories = $this->getCatsSubCats($category, $lang, true, 0, $visitor->city_id, true);
         $setting = Setting::where('id', 1)->select('ignore_review', 'show_views')->first();
         if ($setting->ignore_review == 1) {
             $prods = Product::where('reviewed', 0)->select('id', 'reviewed')->get()

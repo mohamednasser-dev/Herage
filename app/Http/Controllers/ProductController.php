@@ -561,6 +561,7 @@ class ProductController extends Controller
     //to get map ads establish
     public function map_ads(Request $request)
     {
+        
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         $categories = $this->getCatsSubCats('\App\SubCategory', $lang, $request->root(), 7, true);
@@ -569,11 +570,11 @@ class ProductController extends Controller
             ->where('deleted', 0)
             ->where('status', 1)
             ->where('category_id',7);
-
-            $products = $products->select('id', 'title', 'price','sub_category_id', 'sub_category_two_id', 'main_image as image', 'created_at', 'pin','city_id','area_id', 'user_id','latitude','longitude')
-            ->orderBy('pin', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->get()->makeHidden(['City','Area', 'Sub_two_category']);
+        
+        $products = $products->select('id', 'title', 'price','sub_category_id', 'sub_category_two_id', 'main_image as image', 'created_at', 'pin','city_id','area_id', 'user_id','latitude','longitude')
+        ->orderBy('pin', 'desc')
+        ->orderBy('created_at', 'desc')
+        ->get()->makeHidden(['City','Area', 'Sub_two_category']);
         for ($i = 0; $i < count($products); $i++) {
             $products[$i]['show_price'] = true;
             if ($products[$i]['price'] == 0) {
@@ -626,6 +627,7 @@ class ProductController extends Controller
             ->where('deleted', 0)
             ->where('status', 1)
             ->where('category_id',7);
+            
             if ($request->sub_category_id && $request->sub_category_id) {
                 $products = $products->where('sub_category_id', $request->sub_category_id);
             }
@@ -681,6 +683,7 @@ class ProductController extends Controller
             ->where('deleted', 0)
             ->where('status', 1)
             ->where('category_id',7);
+            
             if ($request->sub_category_id && $request->sub_category_id) {
                 $products = $products->where('sub_category_two_id', $request->sub_category_id);
             }
