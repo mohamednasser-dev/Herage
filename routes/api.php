@@ -116,6 +116,8 @@ use Illuminate\Http\Request;
     // get home data
     Route::get('/home-ads/{lang}/{v}' , 'HomeController@getHomeAds')->middleware('checkguest');
     Route::get('/home/city_filter/{area_id}/{lang}/{v}' , 'HomeController@city_filter')->middleware('checkguest');
+    Route::get('/home/city_filter_without_paging/{area_id}/{lang}/{v}' , 'HomeController@city_filter_without_paging')->middleware('checkguest');
+    
 
     // send contact us message
     Route::post('/contactus/{lang}/{v}' , 'ContactUsController@SendMessage')->middleware('checkguest');

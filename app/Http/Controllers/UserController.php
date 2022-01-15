@@ -705,7 +705,7 @@ class UserController extends Controller
         $products = Product::with('City')->with('Area')->with('Publisher')->where('status', 2)
             ->where('deleted', 0)
             ->where('user_id', auth()->user()->id)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id', 'retweet')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id', 'retweet', 'retweet_date')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
@@ -749,7 +749,7 @@ class UserController extends Controller
             ->where('publish', 'Y')
             ->where('deleted', 0)
             ->where('user_id', auth()->user()->id)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id', 'retweet')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id', 'retweet', 'retweet_date')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($current_products); $i++) {
