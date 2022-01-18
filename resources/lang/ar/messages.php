@@ -347,6 +347,7 @@ return [
     "showed" => "مرئى",
     "color" => "اللون",
     "comment_deleted" => "تم حذف التعليق",
-    "comment_published" => "تم نشر التعليق"
+    "comment_published" => "تم نشر التعليق",
+    "retweet" => "إعادة نشر"
 ];
 ?>

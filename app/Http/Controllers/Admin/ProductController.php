@@ -543,33 +543,22 @@ class ProductController extends AdminController
     }
 
     // republish ads
-    public function republishAds(Request $request) {
+    public function retweetAds(Request $request) {
         $ad_period = Setting::find(1)['expier_days'];
         $mytime = Carbon::now();
-        if (isset($request->ad_id)) {
-            $ad = Product::where('id', $request->ad_id)->select('id', 'expiry_date', 'status', 'publish', 'created_at')->first();
-            
-            $ad['created_at'] = $mytime;
-            $ad['expiry_date'] = Date('Y-m-d H:i:s', strtotime('+'.$ad_period.' days'));
-            $ad['status'] = 1;
-            $ad['publish'] = 'Y';
+        
+        $ad = Product::where('id', $request->ad_id)->select('id', 'expiry_date', 'status', 'publish', 'created_at')->first();
+        
+        $ad['created_at'] = $mytime;
+        $ad['expiry_date'] = Date('Y-m-d H:i:s', strtotime('+'.$ad_period.' days'));
+        $ad['status'] = 1;
+        $ad['retweet'] = 1;
+        $ad['retweet_date'] = $mytime;
+        $ad['publish'] = 'Y';
 
-            $ad->save();
-            session()->flash('success', trans('messages.ad_republished'));
-        }else {
-            $ads = Product::where('deleted', 0)->where('publish', 'N')->where('reviewed', 1)->select('id', 'expiry_date', 'status')->get();
-
-            if (count($ads) > 0) {
-                for ($i = 0; $i < count($ads); $i ++) {
-                    $ads[$i]['expiry_date'] = Date('Y-m-d H:i:s', strtotime('+'.$ad_period.' days'));
-                    $ads[$i]['status'] = 1;
-                    $ads[$i]['created_at'] = $mytime;
-                    $ads[$i]['publish'] = 'Y';
-                    $ads[$i]->save();
-                }
-            }
-            session()->flash('success', trans('messages.All_republished'));
-        }
+        $ad->save();
+        session()->flash('success', trans('messages.ad_republished'));
+        
 
         return redirect()->back();
     }

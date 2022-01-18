@@ -233,7 +233,7 @@ Route::group(['middleware'=>'language','prefix' => "admin-panel",'namespace' => 
         Route::post('update/offer/baner', 'ProductController@update_baner')->name("update.offer.baner");
         Route::post('update/offer/english/baner', 'ProductController@update_baner_english')->name("update.offer.baner_english");
         Route::get('review/{product}', 'ProductController@reviewProduct')->name("products.review");
-        Route::get('republish' , 'ProductController@republishAds')->name('republish.ads');
+        Route::get('retweet' , 'ProductController@retweetAds')->name('retweet.ads');
         Route::get('show', 'ProductController@show')->name("products.index");
         Route::get('reports', 'ProductController@reports')->name("products.reports");
         Route::get('comments', 'ProductController@comments')->name("products.comments");

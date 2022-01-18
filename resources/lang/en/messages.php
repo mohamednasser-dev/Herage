@@ -353,7 +353,8 @@
         "showed" => "Showed",
         "color" => "Color",
         "comment_deleted" => "Comment deleted successfully",
-        "comment_published" => "Comment published successfully"
+        "comment_published" => "Comment published successfully",
+        "retweet" => "Retweet"
 
     ];
 ?>
