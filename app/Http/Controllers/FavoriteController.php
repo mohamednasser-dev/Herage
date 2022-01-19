@@ -96,7 +96,7 @@ class FavoriteController extends Controller
             $response = APIHelpers::createApiResponse(true , 406 ,  'تم حظر حسابك', 'تم حظر حسابك' , null, $request->lang );
             return response()->json($response , 406);
         }else {
-            $products = Favorite::select('id','product_id','user_id')
+            $products = Favorite::has('product', '>', 0)->select('id','product_id','user_id')
                                  ->with('Product')
                                  ->where('user_id', $user->id)
                                  ->orderBy('id','desc')
@@ -125,9 +125,10 @@ class FavoriteController extends Controller
                         $products[$i]['show_price'] = false;
                     } 
                     if($lang == 'ar'){
-                        $products[$i]['Product']->address = $products[$i]['Product']->City->title_ar .' , '.$products[$i]['Product']->Area->title_ar;
+                        $products[$i]['Product']->address = $products[$i]->Product->City->title_ar .' , '.$products[$i]['Product']->Area->title_ar;
                     }else{
-                        $products[$i]['Product']->address = $products[$i]['Product']->City->title_en .' , '.$products[$i]['Product']->Area->title_en;
+                        
+                        $products[$i]['Product']->address = $products[$i]->Product->City->title_en .' , '.$products[$i]['Product']->Area->title_en;
                     }
                     $products[$i]['Product']->price  = number_format((float)(  $products[$i]['Product']->price ), 3);
                     if ($user) {
