@@ -194,6 +194,8 @@ use Illuminate\Http\Request;
 
     //favorite
     Route::get('/favorites/{lang}/{v}' , 'FavoriteController@getfavorites');
+    Route::get('/favorites-ios/{lang}/{v}' , 'FavoriteController@getIosfavorites');
+    
     Route::post('/favorite/create/{lang}/{v}' , 'FavoriteController@addtofavorites');
     Route::post('/favorite/destroy/{lang}/{v}' , 'FavoriteController@removefromfavorites');
 

@@ -102,22 +102,6 @@ class FavoriteController extends Controller
                                  ->orderBy('id','desc')
                 ->simplePaginate(12);
 
-//            $inc = 0;
-//            $data = null;
-//            foreach ($favorites as $key => $row){
-//                $product = Product::where('id',$row->product_id)->first();
-//                if($product != null){
-//                    if($product->status == 1 && $product->deleted == 0 && $product->publish == 'Y'){
-//                        $data[$inc]['id'] = $product->id;
-//                        $data[$inc]['title'] = $product->title;
-//                        $data[$inc]['image'] = $product->main_image;
-//                        $data[$inc]['price'] = $product->price;
-//                        $data[$inc]['description'] = $product->description;
-//                        $inc =$inc + 1;
-//                    }
-//                }
-//            }
-
             if (count($products) > 0) {
                 for ($i = 0; $i < count($products); $i++) {
                     $products[$i]['show_price'] = true;
@@ -155,6 +139,61 @@ class FavoriteController extends Controller
             
             $show_views = Setting::where('id', 1)->select('show_views')->first()['show_views'];
             $response = APIHelpers::createApiResponse(false, 200, '', '', ['products' => $products, 'show_views' => $show_views], $request->lang);
+            return response()->json($response, 200);
+        }
+    }
+
+    public function getIosfavorites(Request $request){
+        $user = auth()->user();
+        $lang = $request->lang ;
+        Session::put('api_lang', $lang);
+        if($user->active == 0){
+            $response = APIHelpers::createApiResponse(true , 406 ,  'تم حظر حسابك', 'تم حظر حسابك' , null, $request->lang );
+            return response()->json($response , 406);
+        }else {
+            $products = Favorite::has('product', '>', 0)->select('id','product_id','user_id')
+                                 ->with('Product')
+                                 ->where('user_id', $user->id)
+                                 ->orderBy('id','desc')
+                ->simplePaginate(12);
+// dd($products);
+            if (count($products) > 0) {
+                for ($i = 0; $i < count($products); $i++) {
+                    $products[$i]['show_price'] = true;
+                    if ($products[$i]['price'] == 0) {
+                        $products[$i]['show_price'] = false;
+                    } 
+                    if($lang == 'ar'){
+                        $products[$i]['Product']->address = $products[$i]->Product->City->title_ar .' , '.$products[$i]['Product']->Area->title_ar;
+                    }else{
+                        
+                        $products[$i]['Product']->address = $products[$i]->Product->City->title_en .' , '.$products[$i]['Product']->Area->title_en;
+                    }
+                    $products[$i]['Product']->price  = number_format((float)(  $products[$i]['Product']->price ), 3);
+                    if ($user) {
+                        $favorite = Favorite::where('user_id', $user->id)->where('product_id', $products[$i]['product_id'])->first();
+                        if ($favorite) {
+                            $products[$i]['Product']->favorite  = true;
+                        } else {
+                            $products[$i]['Product']->favorite = false;
+                        }
+
+                        $conversation = Participant::where('ad_product_id', $products[$i]['product_id'])->where('user_id', $user->id)->first();
+                        if ($conversation == null) {
+                            $products[$i]['Product']->conversation_id = 0;
+                        } else {
+                            $products[$i]['Product']->conversation_id = $conversation->conversation_id;
+                        }
+                    } else {
+                        $products[$i]['Product']->favorite = false;
+                        $products[$i]['Product']->conversation_id = 0;
+                    }
+                    $products[$i]['Product']->time = $products[$i]['Product']->created_at->diffForHumans();
+                }
+            }
+            
+            
+            $response = APIHelpers::createApiResponse(false, 200, '', '', $products, $request->lang);
             return response()->json($response, 200);
         }
     }
