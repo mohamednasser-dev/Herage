@@ -68,6 +68,7 @@ class ChatController extends Controller
                 $convs->image = $other_user->User->image;
                 $convs->last_message = $other_user->Conversation->Message->message;
                 $convs->last_message_time = $other_user->Conversation->Message->updated_at->format('g:i a');
+                $convs->last_message_ios_time = APIHelpers::get_time_day($other_user->Conversation->Message->updated_at, "ar");
                 $convs->un_read_num = Message::where('conversation_id', $convs->conversation_id)->where('user_id', '!=', auth()->user()->id)->where('is_read', '0')->count();
                 return $convs;
             });
@@ -231,6 +232,7 @@ class ChatController extends Controller
                 ->get()
                 ->map(function ($messages) use ($user_id) {
                     $messages->time = $messages->created_at->format('g:i a');
+                    $messages->ios_time = APIHelpers::get_time_day($messages->created_at, "ar");
                     if ($messages->user_id == $user_id) {
                         $messages->position = 'right';
                     } else {

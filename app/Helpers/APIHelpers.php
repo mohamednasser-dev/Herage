@@ -224,6 +224,20 @@ class APIHelpers
         curl_close($ch);
         return $result;
     }
+
+    public static function get_time_day($created_at, $lang)
+    {
+        $period = $created_at->format('A');
+        if ($lang == 'ar') {
+            setlocale( LC_ALL,'ar' ); 
+            if ($period == 'pm') {
+                $period = 'م';
+            }else {
+                $period = 'ص';
+            }
+        }
+        return $created_at->format('h:i') . ' ' . $period;
+    }
 }
 
 ?>
