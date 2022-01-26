@@ -933,7 +933,8 @@ class ProductController extends Controller
 
                 //to make retweet date
                 $final_retweet_date_date = $final_retweet_date->addDays(1);
-                $input['retweet_date'] = $final_retweet_date_date;
+                // dd($today);
+                $input['retweet_date'] = $today;
                 $preventComments = 0;
                 if ($request->prevent_comments) {
                     $preventComments = $request->prevent_comments;
