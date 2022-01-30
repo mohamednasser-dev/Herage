@@ -271,6 +271,10 @@ class ProductController extends Controller
             ->limit(3)
             ->get()
             ->map(function ($ads) use ($lang, $user) {
+                $ads['show_price'] = true;
+                if ($ads->price == 0) {
+                    $ads['show_price'] = false;
+                }
                 $ads->price = number_format((float)($ads->price), 3);
                 if ($lang == 'ar') {
                     $ads->address = $ads->City->title_ar . ' , ' . $ads->Area->title_ar;

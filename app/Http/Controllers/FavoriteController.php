@@ -160,7 +160,7 @@ class FavoriteController extends Controller
             if (count($products) > 0) {
                 for ($i = 0; $i < count($products); $i++) {
                     $products[$i]['show_price'] = true;
-                    if ($products[$i]['price'] == 0) {
+                    if ($products[$i]['Product']->price == 0) {
                         $products[$i]['show_price'] = false;
                     } 
                     if($lang == 'ar'){

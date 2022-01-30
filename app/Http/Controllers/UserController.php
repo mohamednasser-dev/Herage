@@ -705,7 +705,7 @@ class UserController extends Controller
         $products = Product::with('City')->with('Area')->with('Publisher')->where('status', 2)
             ->where('deleted', 0)
             ->where('user_id', auth()->user()->id)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id', 'retweet', 'retweet_date')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id', 'retweet', 'retweet_date', 'price')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($products); $i++) {
@@ -713,6 +713,7 @@ class UserController extends Controller
             if ($products[$i]['price'] == 0) {
                 $products[$i]['show_price'] = false;
             } 
+            $products[$i]['price']  = number_format((float)(  $products[$i]['price'] ), 3);
             $retweetDate = new Carbon($products[$i]['retweet_date']);
             if ((!$retweetDate->isToday()) && ($retweetDate->addDay() >= $products[$i]['retweet_date'])) {
                 $products[$i]['retweet'] = 1;
@@ -749,10 +750,15 @@ class UserController extends Controller
             ->where('publish', 'Y')
             ->where('deleted', 0)
             ->where('user_id', auth()->user()->id)
-            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id', 'retweet', 'retweet_date')
+            ->select('id', 'title', 'main_image as image', 'created_at', 'user_id', 'city_id', 'area_id', 'retweet', 'retweet_date', 'price')
             ->orderBy('created_at', 'desc')
             ->simplePaginate(12);
         for ($i = 0; $i < count($current_products); $i++) {
+            $current_products[$i]['show_price'] = true;
+            if ($current_products[$i]['price'] == 0) {
+                $current_products[$i]['show_price'] = false;
+            } 
+            $current_products[$i]['price']  = number_format((float)(  $current_products[$i]['price'] ), 3);
             $retweetDate = new Carbon($current_products[$i]['retweet_date']);
             if ((!$retweetDate->isToday()) && ($retweetDate->addDay() >= $current_products[$i]['retweet_date'])) {
                 $current_products[$i]['retweet'] = 1;
