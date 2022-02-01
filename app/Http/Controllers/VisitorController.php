@@ -62,13 +62,21 @@ class VisitorController extends Controller
 
     // update city
     public function updateCity(Request $request) {
-        if (!$request->header('uniqueid') && $request->city_id) {
-            $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header && city id required field' , 'unique id required header && city id required field'  , null , $request->lang);
+        $validator = Validator::make($request->all(), [
+            'city_id' => 'required|exists:cities,id',
+        ]);
+        
+        if (!$request->header('uniqueid') || $validator->fails()) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header && valid city id required field' , 'unique id required header && valid city id required field'  , null , $request->lang);
             return response()->json($response , 406);
         }
 
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('id', 'city_id', 'unique_id')->first();
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('id', 'city_id', 'unique_id', 'user_id')->first();
         if ($visitor) {
+            if ($visitor->user != null) {
+                $visitor->user->update(['city_id' => $request->city_id]);
+            }
+            
             $visitor->city_id = $request->city_id;
             $visitor->save();
         }
