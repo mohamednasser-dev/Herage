@@ -21,7 +21,7 @@
                                 <tr>
                                     <td class="label-table" > {{ __('messages.image') }} </td>
                                     <td>
-                                        <img src="https://res.cloudinary.com/carsads2021/image/upload/w_100,q_100/v1581928924/{{ $data['notification']['image'] }}" />
+                                        <img src="{{image_cloudinary_url()}}{{ $data['notification']['image'] }}" />
                                     </td>
                                 </tr>
                             @endif
