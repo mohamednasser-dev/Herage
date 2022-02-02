@@ -147,11 +147,14 @@ class CategoryController extends Controller
             return response()->json($response , 406);
         }
         $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        if (!$visitor) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'there is no such visitor' , 'there is no such visitor'  , null , $request->lang);
+            return response()->json($response , 406);
+        }
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         if ($request->category_id != 0) {
             $data['sub_categories'] = $this->getCatsSubCats('\App\SubCategory', $lang, false, $request->category_id, $visitor->city_id,  true);
-            // dd($data['sub_categories']);
             $data['category'] = Category::select('id', 'title_en as title')->find($request->category_id);
         }else {
             $categories = $this->getCatsSubCats('\App\Category', $lang, true, 0, $visitor->city_id, false);
@@ -170,23 +173,13 @@ class CategoryController extends Controller
             ];
        
         }
-        
-
-        // $data['sub_category_array'] = $this->getCatsSubCats('\App\SubCategory', $lang, false, $request->category_id, true);
-
-        
-
-        // for ($i = 0; $i < count($data['sub_category_array']); $i++) {
-        //     $data['sub_category_array'][$i]['selected'] = false;
-        // }
-        //end all button
 
         $lang = $request->lang;
         $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('reviewed', 1)->with('Publisher');
         if ($request->category_id != 0) {
             $products = $products->where('category_id', $request->category_id);
         }
-        if ($visitor && !empty($visitor->city_id)) {
+        if ($visitor->city_id != 0) {
             $products = $products->where('city_id', $visitor->city_id);
         }
         $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
@@ -239,9 +232,6 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header' , 'unique id required header'  , null , $request->lang);
             return response()->json($response , 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
-        $lang = $request->lang;
-        Session::put('api_lang', $lang);
         $validator = Validator::make($request->all(), [
             'category_id' => 'required'
         ]);
@@ -250,20 +240,17 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true, 406, 'بعض الحقول مفقودة', 'بعض الحقول مفقودة', null, $request->lang);
             return response()->json($response, 406);
         }
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $lang = $request->lang;
+        Session::put('api_lang', $lang);
+        if (!$visitor) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'there is no such visitor' , 'there is no such visitor'  , null , $request->lang);
+            return response()->json($response , 406);
+        }
         if ($request->sub_category_id != 0) {
             $data['sub_categories'] = $this->getCatsSubCats('\App\SubTwoCategory', $lang, false, $request->sub_category_id, $visitor->city_id, true);
             $data['sub_category_level1'] = SubCategory::where('id', $request->sub_category_id)->select('id', 'title_' . $lang . ' as title', 'category_id')->first();
-            // $data['sub_category_array'] = $this->getCatsSubCats('\App\SubTwoCategory', $lang, false, $request->sub_category_id, false);
-
-            // if (count($data['sub_category_array']) == 0) {
-            //     $data['sub_category_array'] = SubCategory::where(function ($q) {
-            //         $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-            //             $qq->has('Products', '>', 0);
-            //         });
-            //     })->where('category_id', $request->category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'category_id')
-            //         ->orderBy('sort', 'asc')->get()->makeHidden('category_id')->toArray();
-            // }
+            
             $data['category'] = Category::where('id', $data['sub_category_level1']['category_id'])->select('id', 'title_' . $lang . ' as title')->first();
         } else {
             $pluckSubCats = SubCategory::where('category_id', $request->category_id)->where('deleted', 0)->pluck('id')->toArray();
@@ -273,17 +260,7 @@ class CategoryController extends Controller
                 "title" => "All",
                 "category_id" => (int)$request->category_id
             ];
-            // $data['sub_category_array'] = $this->getCatsSubCats('\App\SubTwoCategory', $lang, false, 0, false, $pluckSubCats);
-            // if (count($data['sub_category_array']) == 0) {
-            //     $data['sub_category_array'] = SubCategory::where(function ($q) {
-            //         $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-            //             $qq->has('Products', '>', 0);
-            //         });
-            //     })->where('category_id', $request->category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'category_id')
-            //         ->orderBy('sort', 'asc')->get()->makeHidden('category_id')->toArray();
-
-            // }
+            
             $data['category'] = Category::where('id', $request->category_id)->select('id', 'title_' . $lang . ' as title')->first();
         }
 
@@ -292,7 +269,7 @@ class CategoryController extends Controller
         
         $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('reviewed', 1);
         
-        if ($visitor && !empty($visitor->city_id)) {
+        if ($visitor->city_id != 0) {
             $products = $products->where('city_id', $visitor->city_id);
         }
 
@@ -351,9 +328,6 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header' , 'unique id required header'  , null , $request->lang);
             return response()->json($response , 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
-        $lang = $request->lang;
-        Session::put('api_lang', $lang);
         $validator = Validator::make($request->all(), [
             'category_id' => 'required'
         ]);
@@ -361,6 +335,13 @@ class CategoryController extends Controller
         if ($validator->fails() && !isset($request->sub_category_level1_id)) {
             $response = APIHelpers::createApiResponse(true, 406, 'بعض الحقول مفقودة', 'بعض الحقول مفقودة', null, $request->lang);
             return response()->json($response, 406);
+        }
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $lang = $request->lang;
+        Session::put('api_lang', $lang);
+        if (!$visitor) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'there is no such visitor' , 'there is no such visitor'  , null , $request->lang);
+            return response()->json($response , 406);
         }
 
         $subCategories = SubCategory::where('category_id', $request->category_id)->pluck('id')->toArray();
@@ -370,21 +351,7 @@ class CategoryController extends Controller
             $data['sub_categories'] = $this->getCatsSubCats('\App\SubThreeCategory', $lang, false, $request->sub_category_id, $visitor->city_id, true);
 
             $data['sub_category_level2'] = SubTwoCategory::where('id', $request->sub_category_id)->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->first();
-            // if ($request->sub_category_level1_id != 0) {
-            //     $data['sub_category_array'] = SubThreeCategory::where(function ($q) {
-            //         $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-            //             $qq->has('Products', '>', 0);
-            //         });
-            //     })->where('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // } else {
-            //     $data['sub_category_array'] = SubThreeCategory::where(function ($q) {
-            //         $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-            //             $qq->has('Products', '>', 0);
-            //         });
-            //     })->whereIn('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // }
+            
             $data['category'] = Category::where('id', $request->category_id)->select('id', 'title_' . $lang . ' as title')->first();
         } else {
 
@@ -393,21 +360,7 @@ class CategoryController extends Controller
                 "title" => "All",
                 "sub_category_id" => (int)$request->sub_category_level1_id
             ];
-            // if ($request->sub_category_level1_id != 0) {
-            //     $data['sub_category_array'] = SubThreeCategory::where(function ($q) {
-            //         $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-            //             $qq->has('Products', '>', 0);
-            //         });
-            //     })->where('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // } else {
-            //     $data['sub_category_array'] = SubThreeCategory::where(function ($q) {
-            //         $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-            //             $qq->has('Products', '>', 0);
-            //         });
-            //     })->whereIn('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // }
+            
             $secondIds = SubTwoCategory::where('sub_category_id', $request->sub_category_level1_id)->where('deleted', 0)->pluck('id')->toArray();
             
             $data['sub_categories'] = $this->getCatsSubCats('\App\SubThreeCategory', $lang, false, 0, $visitor->city_id, true, $secondIds);
@@ -429,7 +382,7 @@ class CategoryController extends Controller
             $products = $products->where('sub_category_two_id', $request->sub_category_id);
         }
 
-        if ($visitor && !empty($visitor->city_id)) {
+        if ($visitor->city_id != 0) {
             $products = $products->where('city_id', $visitor->city_id);
         }
 
@@ -484,9 +437,6 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header' , 'unique id required header'  , null , $request->lang);
             return response()->json($response , 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
-        $lang = $request->lang;
-        Session::put('api_lang', $lang);
         $validator = Validator::make($request->all(), [
             'category_id' => 'required'
         ]);
@@ -494,6 +444,13 @@ class CategoryController extends Controller
         if ($validator->fails() && !isset($request->sub_category_level2_id) && !isset($request->sub_category_level1_id)) {
             $response = APIHelpers::createApiResponse(true, 406, 'بعض الحقول مفقودة', 'بعض الحقول مفقودة', null, $request->lang);
             return response()->json($response, 406);
+        }
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $lang = $request->lang;
+        Session::put('api_lang', $lang);
+        if (!$visitor) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'there is no such visitor' , 'there is no such visitor'  , null , $request->lang);
+            return response()->json($response , 406);
         }
 
 
@@ -512,23 +469,7 @@ class CategoryController extends Controller
 
         if ($request->sub_category_id != 0) {
             $data['sub_categories'] = $this->getCatsSubCats('\App\SubFourCategory', $lang, false, $request->sub_category_id, $visitor->city_id, true);
-            
             $data['sub_category_level3'] = SubThreeCategory::where('id', $request->sub_category_id)->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->first();
-            // if ($request->sub_category_level2_id == 0) {
-            //     $data['sub_category_array'] = SubFourCategory::where(function ($q) {
-            //         $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-            //             $qq->has('Products', '>', 0);
-            //         });
-            //     })->where('deleted', 0)->whereIn('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // } else {
-            //     $data['sub_category_array'] = SubFourCategory::where(function ($q) {
-            //         $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-            //             $qq->has('Products', '>', 0);
-            //         });
-            //     })->where('deleted', 0)->where('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // }
 
             $data['category'] = Category::where('id', $request->category_id)->select('id', 'title_' . $lang . ' as title')->first();
         } else {
@@ -538,21 +479,6 @@ class CategoryController extends Controller
                 "title" => "All",
                 "sub_category_id" => (int)$request->sub_category_level2_id
             ];
-            // if ($request->sub_category_level2_id == 0) {
-            //     $data['sub_category_array'] = SubFourCategory::where(function ($q) {
-            //         $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-            //             $qq->has('Products', '>', 0);
-            //         });
-            //     })->where('deleted', 0)->whereIn('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // } else {
-            //     $data['sub_category_array'] = SubFourCategory::where(function ($q) {
-            //         $q->has('SubCategories', '>', 0)->orWhere(function ($qq) {
-            //             $qq->has('Products', '>', 0);
-            //         });
-            //     })->where('deleted', 0)->where('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // }
 
             $data['category'] = Category::where('id', $request->category_id)->select('id', 'title_' . $lang . ' as title')->first();
         }
@@ -562,7 +488,7 @@ class CategoryController extends Controller
             $products = $products->where('sub_category_three_id', $request->sub_category_id);
         }
 
-        if ($visitor && !empty($visitor->city_id)) {
+        if ($visitor->city_id != 0) {
             $products = $products->where('city_id', $visitor->city_id);
         }
 
@@ -622,9 +548,6 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header' , 'unique id required header'  , null , $request->lang);
             return response()->json($response , 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
-        $lang = $request->lang;
-        Session::put('api_lang', $lang);
         $validator = Validator::make($request->all(), [
             'category_id' => 'required'
         ]);
@@ -632,6 +555,14 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true, 406, 'بعض الحقول مفقودة', 'بعض الحقول مفقودة', null, $request->lang);
             return response()->json($response, 406);
         }
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $lang = $request->lang;
+        Session::put('api_lang', $lang);
+        if (!$visitor) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'there is no such visitor' , 'there is no such visitor'  , null , $request->lang);
+            return response()->json($response , 406);
+        }
+        
         if ($request->sub_category_level1_id == 0) {
             $subCategories = SubCategory::where('deleted', 0)->where('category_id', $request->category_id)->pluck('id')->toArray();
             $subCategoriesTwo = SubTwoCategory::where('deleted', 0)->whereIn('sub_category_id', $subCategories)->pluck('id')->toArray();
@@ -652,17 +583,7 @@ class CategoryController extends Controller
             $data['sub_categories'] = $this->getCatsSubCats('\App\SubFiveCategory', $lang, false, $request->sub_category_id, $visitor->city_id, true);
         
             $data['sub_category_level4'] = SubFourCategory::where('deleted', 0)->where('sub_category_id', $request->sub_category_id)->select('id', 'image', 'title_' . $lang . ' as title')->first();
-            // if ($request->sub_category_level3_id == 0) {
-            //     $data['sub_category_array'] = SubFiveCategory::where(function ($q) {
-            //         $q->has('Products', '>', 0);
-            //     })->where('deleted', '0')->whereIn('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // } else {
-            //     $data['sub_category_array'] = SubFiveCategory::where(function ($q) {
-            //         $q->has('Products', '>', 0);
-            //     })->where('deleted', '0')->where('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // }
+            
             $data['category'] = Category::where('id', $request->category_id)->select('id', 'title_' . $lang . ' as title')->first();
         } else {
             $data['sub_categories'] = $this->getCatsSubCats('\App\SubFiveCategory', $lang, false, 0, $visitor->city_id, false, $subCategoriesFour);
@@ -671,17 +592,7 @@ class CategoryController extends Controller
                 "title" => "All",
                 "sub_category_id" => (int)$request->sub_category_level2_id
             ];
-            // if ($request->sub_category_level3_id == 0) {
-            //     $data['sub_category_array'] = SubFiveCategory::where(function ($q) {
-            //         $q->has('Products', '>', 0);
-            //     })->where('deleted', '0')->whereIn('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // } else {
-            //     $data['sub_category_array'] = SubFiveCategory::where(function ($q) {
-            //         $q->has('Products', '>', 0);
-            //     })->where('deleted', '0')->where('sub_category_id', $request->sub_category_id)
-            //         ->select('id', 'title_' . $lang . ' as title', 'sub_category_id')->orderBy('sort', 'asc')->get()->toArray();
-            // }
+            
             $data['category'] = Category::where('id', $request->category_id)->select('id', 'title_' . $lang . ' as title')->first();
         }
         
@@ -691,7 +602,7 @@ class CategoryController extends Controller
         if ($request->sub_category_id != 0) {
             $products = $products->where('sub_category_four_id', $request->sub_category_id);
         }
-        if ($visitor && !empty($visitor->city_id)) {
+        if ($visitor->city_id != 0) {
             $products = $products->where('city_id', $visitor->city_id);
         }
         if ($request->sub_category_level3_id != 0) {
@@ -752,9 +663,6 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header' , 'unique id required header'  , null , $request->lang);
             return response()->json($response , 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
-        $lang = $request->lang;
-        Session::put('api_lang', $lang);
         $validator = Validator::make($request->all(), [
             'sub_category_level1_id' => 'required',
             'sub_category_level2_id' => 'required',
@@ -767,6 +675,14 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true, 406, 'بعض الحقول مفقودة', 'بعض الحقول مفقودة', null, $request->lang);
             return response()->json($response, 406);
         }
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $lang = $request->lang;
+        Session::put('api_lang', $lang);
+        if (!$visitor) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'there is no such visitor' , 'there is no such visitor'  , null , $request->lang);
+            return response()->json($response , 406);
+        }
+        
 
         if ($request->sub_category_level1_id == 0) {
             $subCategories = SubCategory::where('deleted', 0)->where('category_id', $request->category_id)->pluck('id')->toArray();

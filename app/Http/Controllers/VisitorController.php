@@ -63,7 +63,7 @@ class VisitorController extends Controller
     // update city
     public function updateCity(Request $request) {
         $validator = Validator::make($request->all(), [
-            'city_id' => 'required|exists:cities,id',
+            'city_id' => 'required',
         ]);
         
         if (!$request->header('uniqueid') || $validator->fails()) {

@@ -133,6 +133,11 @@ class HomeController extends Controller
         $user = auth()->user();
         $cat_ids =[];
         $category = '\App\Category';
+        
+        if (!$visitor) {
+            $response = APIHelpers::createApiResponse(true , 406 , 'there is no such visitor' , 'there is no such visitor'  , null , $request->lang);
+            return response()->json($response , 406);
+        }
         $categories = $this->getCatsSubCats($category, $lang, true, 0, $visitor->city_id, true);
         $setting = Setting::where('id', 1)->select('ignore_review', 'show_views')->first();
         if ($setting->ignore_review == 1) {
@@ -150,7 +155,7 @@ class HomeController extends Controller
             }
         }
         $data['categories'] = $categories;
-        if($visitor->city_id == null){
+        if($visitor->city_id == 0){
             $products = Product::where('status', 1)
                 ->with('Publisher')
                 ->where('publish', 'Y')

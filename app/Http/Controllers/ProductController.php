@@ -584,7 +584,6 @@ class ProductController extends Controller
     //to get map ads establish
     public function map_ads(Request $request)
     {
-        
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         $categories = $this->getCatsSubCats('\App\SubCategory', $lang, $request->root(), 7, true);
