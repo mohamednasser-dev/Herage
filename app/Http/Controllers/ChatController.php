@@ -270,8 +270,6 @@ class ChatController extends Controller
         Message::where('id', $request->message_id)->update($input);
         $response = APIHelpers::createApiResponse(false, 200, 'message seen successfuly', 'تم رؤية الرسالة بنجاح', null, $request->lang);
         return response()->json($response, 200);
-
-
     }
 
     public function search_conversation(Request $request)
@@ -279,7 +277,7 @@ class ChatController extends Controller
         $user_id = auth()->user()->id;
         $users = User::where('name', 'like', '%' . $request->search . '%')->get();
         $users_arr = null;
-        $convs_arr = null;
+        $convs_arr = [];
         $searched_convs = null;
         if (count($users) == 0) {
             if ($request->type == 'ios') {
@@ -298,9 +296,9 @@ class ChatController extends Controller
         foreach ($data_partics as $key => $row) {
             $convs_arr[$key] = $row->conversation_id;
         }
+        // dd($convs_arr);
         $others = Participant::wherein('user_id', $users_arr)->wherein('conversation_id', $convs_arr)->get();
         if (count($others) == 0) {
-
             if ($request->type == 'ios') {
                 $data['conversations'] = [];
                 $response = APIHelpers::createApiResponse(false, 200, 'no chat for inserted search key', 'لا يوجد دردشة باسم المستخدم المختار', $data, $request->lang);
@@ -313,11 +311,13 @@ class ChatController extends Controller
         foreach ($others as $key => $row) {
             $searched_convs[$key] = $row->conversation_id;
         }
+        
         $data['conversations'] = Participant::where('user_id', $user_id)->wherein('conversation_id', $searched_convs)
             ->get()
             ->map(function ($convs) use ($user_id) {
                 $other_user = Participant::where('conversation_id', $convs->conversation_id)->where('user_id', '!=', $user_id)->first();
                 $convs->other_user_id = $other_user->User->id;
+                $convs->ad_name = $convs->Ad_product->title;
                 $convs->user_name = $other_user->User->name;
                 $convs->image = $other_user->User->image;
                 $convs->last_message = $other_user->Conversation->Message->message;
