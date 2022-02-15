@@ -371,7 +371,7 @@ class UserController extends Controller
         $notifications_ids = UserNotification::where('user_id', $user_id)->orderBy('id', 'desc')->select('notification_id')->get();
         $notifications = [];
         for ($i = 0; $i < count($notifications_ids); $i++) {
-            $notifications[$i] = Notification::select('id', 'title', 'body', 'image', 'created_at')->find($notifications_ids[$i]['notification_id']);
+            $notifications[$i] = Notification::select('id', 'title', 'body', 'image', 'ad_id', 'created_at')->find($notifications_ids[$i]['notification_id']);
         }
         $data['notifications'] = $notifications;
         $response = APIHelpers::createApiResponse(false, 200, '', '', $data['notifications'], $request->lang);

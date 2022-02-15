@@ -63,7 +63,7 @@ class NotificationController extends AdminController{
             $user_notification->save();
         }
 		$the_image = "https://res.cloudinary.com/duwmvqjpo/image/upload/w_100,q_100/v1581928924/".$notification->image;
-        $notificationss = APIHelpers::send_notification($notification->title , $notification->body , $the_image , null , $fcm_tokens);
+        $notificationss = APIHelpers::send_notification($notification->title , $notification->body , $the_image , (object)[] , $fcm_tokens);
 		
         return redirect('admin-panel/notifications/show');
     }
@@ -78,7 +78,7 @@ class NotificationController extends AdminController{
         $array_values = Visitor::pluck('fcm_token')->toArray();
         
 		
-        $nots = APIHelpers::send_notification($notification->title , $notification->body , $notification->image , null , $array_values);
+        $nots = APIHelpers::send_notification($notification->title , $notification->body , $notification->image , (object)[] , $array_values);
         //dd($nots);
 		session()->flash('success', trans('messages.sent_s'));
         return redirect()->back();

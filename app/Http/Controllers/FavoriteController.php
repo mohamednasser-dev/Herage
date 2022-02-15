@@ -11,6 +11,8 @@ use App\Favorite;
 use App\Product;
 use App\Setting;
 use App\Visitor;
+use App\Notification;
+use App\UserNotification;
 
 class FavoriteController extends Controller
 {
@@ -42,7 +44,7 @@ class FavoriteController extends Controller
             $favorite->product_id = $request->product_id;
             $favorite->save();
             $product = Product::where("id", $request->product_id)->select('id', 'user_id', 'title')->first();
-            $lastToken = Visitor::where('user_id', $product->user_id)->where('fcm_token' ,'!=' , null)->latest('updated_at')->select('fcm_token')->first();
+            $lastToken = Visitor::where('user_id', $product->user_id)->where('fcm_token' ,'!=' , null)->latest('updated_at')->select('id', 'fcm_token')->first();
             
             $title = "Herag";
             $body = $user->name . " has added your ad " . $product->title . " to favorite list";
@@ -52,7 +54,13 @@ class FavoriteController extends Controller
             }
             
             if ($lastToken) {
-                $notificationss = APIHelpers::send_notification($title , $body , "", null , [$lastToken->fcm_token]);
+                $notification = Notification::create(['title' => $title, 'body' => $body, 'ad_id' => $request->product_id]);
+                UserNotification::create([
+                    'user_id' => $user->id,
+                    'notification_id' => $notification->id,
+                    'visitor_id' => $lastToken->id
+                    ]);
+                $notificationss = APIHelpers::send_notification($title , $body , "", (object)['ad_id' => $request->product_id] , [$lastToken->fcm_token]);
             }
             
             
@@ -156,7 +164,7 @@ class FavoriteController extends Controller
                                  ->where('user_id', $user->id)
                                  ->orderBy('id','desc')
                 ->simplePaginate(12);
-// dd($products);
+
             if (count($products) > 0) {
                 for ($i = 0; $i < count($products); $i++) {
                     $products[$i]['show_price'] = true;

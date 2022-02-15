@@ -145,7 +145,6 @@ class APIHelpers
     // send fcm notification
     public static function send_notification($title, $body, $image, $data, $token)
     {
-
         $message = $body;
         $title = $title;
         $image = $image;
@@ -158,7 +157,7 @@ class APIHelpers
         );
 
         $fields = array('registration_ids' => $token,
-            'notification' => array('title' => $title, 'body' => $message, 'image' => $image));
+            'notification' => array('title' => $title, 'body' => $message, 'image' => $image, 'data' => $data));
 
         $payload = json_encode($fields);
         $curl_session = curl_init();

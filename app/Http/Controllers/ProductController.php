@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Category;
-use App\ContactUs;
-use App\Conversation;
+use App\Notification;
+use App\UserNotification;
 use App\Category_option;
 use App\Models\Student;
 use App\Participant;
@@ -1940,7 +1940,7 @@ class ProductController extends Controller
         $comment->product_id = $request->product_id;
         $comment->save();
         $product = Product::where('id', $request->product_id)->select('id', 'user_id', 'title')->first();
-        $lastToken = Visitor::where('user_id', $product->user_id)->where('fcm_token' ,'!=' , null)->latest('updated_at')->select('fcm_token')->first();
+        $lastToken = Visitor::where('user_id', $product->user_id)->where('fcm_token' ,'!=' , null)->latest('updated_at')->select('id', 'fcm_token')->first();
 
         $title = "Herag";
         $body = $user->name . " has added a new comment on your ad " . $product->title;
@@ -1949,7 +1949,13 @@ class ProductController extends Controller
             $body = $user->name . " قام بإضافة تعليق جديد على إعلانك " . $product->title;
         }
         if ($lastToken) {
-            $notificationss = APIHelpers::send_notification($title , $body , "", null , [$lastToken->fcm_token]);
+            $notification = Notification::create(['title' => $title, 'body' => $body, 'ad_id' => $request->product_id]);
+            UserNotification::create([
+                'user_id' => $user->id,
+                'notification_id' => $notification->id,
+                'visitor_id' => $lastToken->id
+                ]);
+            $notificationss = APIHelpers::send_notification($title , $body , "", (object)['ad_id' => $request->product_id] , [$lastToken->fcm_token]);
         }
 
 
