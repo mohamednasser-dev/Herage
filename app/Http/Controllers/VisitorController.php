@@ -66,6 +66,7 @@ class VisitorController extends Controller
     public function updateCity(Request $request) {
         $validator = Validator::make($request->all(), [
             'city_id' => 'required',
+            'area_id' => 'required'
         ]);
         
         if (!$request->header('uniqueid') || $validator->fails()) {
@@ -73,12 +74,12 @@ class VisitorController extends Controller
             return response()->json($response , 406);
         }
 
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('id', 'city_id', 'unique_id', 'user_id')->first();
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('id', 'city_id', 'area_id', 'unique_id', 'user_id')->first();
         if ($visitor) {
             if ($visitor->user != null) {
-                $visitor->user->update(['city_id' => $request->city_id]);
+                $visitor->user->update(['city_id' => $request->city_id, 'area_id' => $request->area_id]);
             }
-            
+            $visitor->area_id = $request->area_id;
             $visitor->city_id = $request->city_id;
             $visitor->save();
         }

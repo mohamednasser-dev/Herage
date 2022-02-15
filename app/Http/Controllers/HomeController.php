@@ -127,7 +127,7 @@ class HomeController extends Controller
             $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header' , 'unique id required header'  , null , $request->lang);
             return response()->json($response , 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'area_id', 'unique_id')->first();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         $user = auth()->user();
@@ -172,8 +172,11 @@ class HomeController extends Controller
                 ->where('publish', 'Y')
                 ->where('deleted', 0)
                 ->where('reviewed', 1)
-                ->where('city_id',  $visitor->city_id )
-                ->whereIn('category_id', $cat_ids)
+                ->where('city_id',  $visitor->city_id );
+                if ($visitor->area_id != 0) {
+                    $products = $products->where('area_id', $visitor->area_id);
+                }
+            $products = $products->whereIn('category_id', $cat_ids)
                 ->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
                 ->orderBy('created_at', 'desc')
                 ->get()->makeHidden(['City','Area']);
