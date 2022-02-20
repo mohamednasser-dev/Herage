@@ -157,7 +157,10 @@ class APIHelpers
         );
 
         $fields = array('registration_ids' => $token,
-            'notification' => array('title' => $title, 'body' => $message, 'image' => $image, 'data' => $data));
+            'notification' => array('title' => $title, 'body' => $message, 'image' => $image, 'data' => $data),
+            'vibrate' => 1,
+            'sound' => 1
+        );
 
         $payload = json_encode($fields);
         $curl_session = curl_init();

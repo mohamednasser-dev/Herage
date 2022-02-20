@@ -46,10 +46,9 @@ class FavoriteController extends Controller
             $product = Product::where("id", $request->product_id)->select('id', 'user_id', 'title')->first();
             $lastToken = Visitor::where('user_id', $product->user_id)->where('fcm_token' ,'!=' , null)->latest('updated_at')->select('id', 'fcm_token')->first();
             
-            $title = "Herag";
+            $title = "الإعلان";
             $body = $user->name . " has added your ad " . $product->title . " to favorite list";
             if ($request->lang == 'ar') {
-                $title = "حراج";
                 $body = $user->name . " قام بإضافة إعلانك " . $product->title . " إلى المفضلة";
             }
             

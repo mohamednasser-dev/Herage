@@ -1942,10 +1942,9 @@ class ProductController extends Controller
         $product = Product::where('id', $request->product_id)->select('id', 'user_id', 'title')->first();
         $lastToken = Visitor::where('user_id', $product->user_id)->where('fcm_token' ,'!=' , null)->latest('updated_at')->select('id', 'fcm_token')->first();
 
-        $title = "Herag";
+        $title = "الإعلان";
         $body = $user->name . " has added a new comment on your ad " . $product->title;
         if ($request->lang == 'ar') {
-            $title = "حراج";
             $body = $user->name . " قام بإضافة تعليق جديد على إعلانك " . $product->title;
         }
         if ($lastToken) {
