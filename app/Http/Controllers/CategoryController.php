@@ -146,7 +146,7 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header' , 'unique id required header'  , null , $request->lang);
             return response()->json($response , 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'area_id', 'unique_id')->first();
         if (!$visitor) {
             $response = APIHelpers::createApiResponse(true , 406 , 'there is no such visitor' , 'there is no such visitor'  , null , $request->lang);
             return response()->json($response , 406);
@@ -175,12 +175,16 @@ class CategoryController extends Controller
         }
 
         $lang = $request->lang;
+        
         $products = Product::where('status', 1)->where('publish', 'Y')->where('deleted', 0)->where('reviewed', 1)->with('Publisher');
         if ($request->category_id != 0) {
             $products = $products->where('category_id', $request->category_id);
         }
         if ($visitor->city_id != 0) {
             $products = $products->where('city_id', $visitor->city_id);
+        }
+        if ($visitor->area_id != 0) {
+            $products = $products->where('area_id', $visitor->area_id);
         }
         $products = $products->select('id', 'title', 'main_image as image', 'created_at', 'user_id','city_id','area_id', 'price', 'views')
         ->orderBy('created_at', 'desc')->simplePaginate(12);
@@ -240,7 +244,7 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true, 406, 'بعض الحقول مفقودة', 'بعض الحقول مفقودة', null, $request->lang);
             return response()->json($response, 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'area_id', 'unique_id')->first();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         if (!$visitor) {
@@ -275,6 +279,10 @@ class CategoryController extends Controller
 
         if ($request->sub_category_id != 0) {
             $products = $products->where('sub_category_id', $request->sub_category_id);
+        }
+
+        if ($visitor->area_id != 0) {
+            $products = $products->where('area_id', $visitor->area_id);
         }
         
         $products = $products->with('Publisher')
@@ -336,7 +344,7 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true, 406, 'بعض الحقول مفقودة', 'بعض الحقول مفقودة', null, $request->lang);
             return response()->json($response, 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'area_id', 'unique_id')->first();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         if (!$visitor) {
@@ -384,6 +392,10 @@ class CategoryController extends Controller
 
         if ($visitor->city_id != 0) {
             $products = $products->where('city_id', $visitor->city_id);
+        }
+
+        if ($visitor->area_id != 0) {
+            $products = $products->where('area_id', $visitor->area_id);
         }
 
         if ($request->sub_category_level1_id != 0) {
@@ -445,7 +457,7 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true, 406, 'بعض الحقول مفقودة', 'بعض الحقول مفقودة', null, $request->lang);
             return response()->json($response, 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'area_id', 'unique_id')->first();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         if (!$visitor) {
@@ -490,6 +502,10 @@ class CategoryController extends Controller
 
         if ($visitor->city_id != 0) {
             $products = $products->where('city_id', $visitor->city_id);
+        }
+
+        if ($visitor->area_id != 0) {
+            $products = $products->where('area_id', $visitor->area_id);
         }
 
         if ($request->sub_category_level2_id != 0) {
@@ -555,7 +571,7 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true, 406, 'بعض الحقول مفقودة', 'بعض الحقول مفقودة', null, $request->lang);
             return response()->json($response, 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'area_id', 'unique_id')->first();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         if (!$visitor) {
@@ -604,6 +620,9 @@ class CategoryController extends Controller
         }
         if ($visitor->city_id != 0) {
             $products = $products->where('city_id', $visitor->city_id);
+        }
+        if ($visitor->area_id != 0) {
+            $products = $products->where('area_id', $visitor->area_id);
         }
         if ($request->sub_category_level3_id != 0) {
             $products = $products->where('sub_category_three_id', $request->sub_category_level3_id);
@@ -675,7 +694,7 @@ class CategoryController extends Controller
             $response = APIHelpers::createApiResponse(true, 406, 'بعض الحقول مفقودة', 'بعض الحقول مفقودة', null, $request->lang);
             return response()->json($response, 406);
         }
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
+        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'area_id', 'unique_id')->first();
         $lang = $request->lang;
         Session::put('api_lang', $lang);
         if (!$visitor) {
@@ -722,6 +741,9 @@ class CategoryController extends Controller
         }
         if ($visitor && !empty($visitor->city_id)) {
             $products = $products->where('city_id', $visitor->city_id);
+        }
+        if ($visitor->area_id != 0) {
+            $products = $products->where('area_id', $visitor->area_id);
         }
         if ($request->sub_category_level2_id != 0) {
             $products = $products->where('sub_category_two_id', $request->sub_category_level2_id);
