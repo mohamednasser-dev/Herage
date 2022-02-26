@@ -668,25 +668,16 @@ class UserController extends Controller
     // nasser code
     public function my_account(Request $request)
     {
-        if (!$request->header('uniqueid')) {
-            $response = APIHelpers::createApiResponse(true , 406 , 'unique id required header' , 'unique id required header'  , null , $request->lang);
-            return response()->json($response , 406);
-        }
+        
         $lang = $request->lang;
         $user = auth()->user();
         Session::put('api_lang', $lang);
-        $data['personal_data'] = User::with('Area')->with('Account_type')
-            ->where('id', $user->id)
-            ->select('id', 'name', 'email', 'about_user', 'image', 'cover', 'phone', 'watsapp', 'city_id', 'area_id', 'account_type', 'created_at', 'updated_at')
-            ->first();
+        $data['personal_data'] = User::with('City')->with('Area')->with('Account_type')
+        ->where('id', $user->id)
+        ->select('id', 'name', 'email', 'about_user', 'image', 'cover', 'phone', 'watsapp', 'city_id', 'area_id', 'account_type', 'created_at')
+        ->first();
         $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('city_id', 'unique_id')->first();
         
-        if (!empty($visitor->city_id)) {
-            $data['personal_data']->city_id = $visitor->city_id;
-        }
-        if ($visitor->city_id == 0) {
-            $data['personal_data']->city = (object)["id" => 0];
-        }
         $data['personal_data']->last_seen = $data['personal_data']->updated_at->diffForHumans();
         $user_specialties = User_specialty::with('Specialty')
             ->select('special_id')
