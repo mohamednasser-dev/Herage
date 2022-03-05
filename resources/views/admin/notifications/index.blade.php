@@ -20,6 +20,7 @@
                         <tr>
                             <th>id</th>
                             <th>{{ __('messages.notification_title') }}</th>
+                            <th>{{ __('messages.account_type') }}</th>
                             <th class="text-center">{{ __('messages.details') }}</th>
                             @if(Auth::user()->delete_data) 
                                 <th class="text-center" >{{ __('messages.delete') }}</th>                            
@@ -32,6 +33,7 @@
                             <tr>
                                 <td><?=$i;?></td>
                                 <td>{{ $notification->title }}</td>
+                                <td>{{ $notification->account_type }}</td>
                                 <td class="text-center blue-color"><a href="/admin-panel/notifications/details/{{ $notification->id }}" ><i class="far fa-eye"></i></a></td>
                                 @if(Auth::user()->delete_data)
                                     <td class="text-center blue-color" ><a onclick="return confirm('Are you sure you want to delete this item?');" href="/admin-panel/notifications/delete/{{ $notification->id }}" ><i class="far fa-trash-alt"></i></a></td>                                

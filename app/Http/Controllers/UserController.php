@@ -366,9 +366,13 @@ class UserController extends Controller
             $response = APIHelpers::createApiResponse(true, 406, 'تم حظر حسابك من الادمن', '', null, $request->lang);
             return response()->json($response, 406);
         }
-
+        if (!$request->header('uniqueid')) {
+            $response = APIHelpers::createApiResponse(true , 406 ,  'uniqueid is required header', 'uniqueid is required header' , null, $request->lang );
+            return response()->json($response , 406);
+        }
         $user_id = $user->id;
-        $notifications_ids = UserNotification::where('user_id', $user_id)->orderBy('id', 'desc')->select('notification_id')->get();
+        $visitor = Visitor::where('unique_id', $request->unique_id)->select('id')->first();
+        $notifications_ids = UserNotification::where('user_id', $user_id)->where('visitor_id', $visitor->id)->orderBy('id', 'desc')->select('notification_id')->get();
         $notifications = [];
         for ($i = 0; $i < count($notifications_ids); $i++) {
             $notifications[$i] = Notification::select('id', 'title', 'body', 'image', 'ad_id', 'created_at')->find($notifications_ids[$i]['notification_id']);

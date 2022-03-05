@@ -240,6 +240,7 @@ Route::group(['middleware'=>'language','prefix' => "admin-panel",'namespace' => 
         Route::post('comments/reject', 'ProductController@rejectComment')->name("products.comments.reject");
         
         Route::get('comments/reports/{comment}', 'ProductController@commentsReports')->name("products.comments.reports");
+        Route::get('comments-reports', 'ProductController@showAllCommentsReports')->name("products.allcomments.reports");
         
         Route::get('product_comments/{id}', 'ProductController@product_comments')->name("product.comments");
         Route::get('comments/approval/{type}/{id}', 'ProductController@comment_approval')->name("comment.approve");

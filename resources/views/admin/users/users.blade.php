@@ -11,9 +11,9 @@
                         <h4>{{ __('messages.show_users') }}</h4>
                     </div>
                     <div class="col-md-6 pl-0 col-sm-6 col-12 text-right">
-                     <a class="btn btn-success mb-2" id="btn_send" data-toggle="modal" data-target="#zoomup_group_Modal" >
+                     {{-- <a class="btn btn-success mb-2" id="btn_send" data-toggle="modal" data-target="#zoomup_group_Modal" >
                          {{ __('messages.send_free_balance_for_all_users') }}
-                     </a>
+                     </a> --}}
                     </div>
                 </div>
             </div>
@@ -26,7 +26,7 @@
                             <th>{{ __('messages.user_name') }}</th>
                             <th>{{ __('messages.user_phone') }}</th>
                             <th class="text-center">{{ __('messages.block_active') }}</th>
-                            <th class="text-center">{{ __('messages.send_balance') }}</th>
+                            {{-- <th class="text-center">{{ __('messages.send_balance') }}</th> --}}
                             <th class="text-center">{{ __('messages.details') }}</th>
                             <th class="text-center">{{ __('messages.products') }}</th>
                             @if(Auth::user()->update_data)
@@ -52,7 +52,7 @@
                                         </a>
                                     @endif
                                 </td>
-                                <td>
+                                {{-- <td>
                                     <a class="btn btn-warning mb-2 mr-2 btn-rounded" data-user="{{$user->id}}"
                                        id="btn_send" data-toggle="modal"
                                        data-target="#zoomupModal">{{ __('messages.send_balance') }}
@@ -64,7 +64,7 @@
                                             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                                         </svg>
                                     </a>
-                                </td>
+                                </td> --}}
                                 <td class="text-center blue-color"><a href="/admin-panel/users/details/{{ $user->id }}"><i
                                             class="far fa-eye"></i></a></td>
                                 <td class="text-center blue-color"><a href="{{ route('user.products', $user->id) }}"><i

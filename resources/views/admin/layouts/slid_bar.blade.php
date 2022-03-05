@@ -111,6 +111,11 @@
                                     @endif
                                 </a>
                             </li>
+                            <li class="comments-reports">
+                                <a href="{{ route('products.allcomments.reports') }}">{{ __('messages.comment_reports') }}
+                                    
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 @endif
@@ -250,7 +255,13 @@
                             data-parent="#accordionExample">
                             @if(Auth::user()->add_data)
                                 <li class="send">
-                                    <a href="/admin-panel/notifications/send"> {{ __('messages.send') }} </a>
+                                    <a style="font-size: 10px" href="/admin-panel/notifications/send?type=all"> {{ __('messages.send_to_all_users') }} </a>
+                                </li>
+                                <li class="send">
+                                    <a style="font-size: 10px" href="/admin-panel/notifications/send?type=personal"> {{ __('messages.send_to_personal') }} </a>
+                                </li>
+                                <li class="send">
+                                    <a style="font-size: 10px" href="/admin-panel/notifications/send?type=commercial"> {{ __('messages.send_to_commercial_accounts') }} </a>
                                 </li>
                             @endif
                             <li class="show">

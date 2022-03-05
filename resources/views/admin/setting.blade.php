@@ -75,7 +75,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card">
+                        {{-- <div class="card">
                             <div class="card-header" id="...">
                                 <section class="mb-0 mt-0">
                                     <div role="menu" class="collapsed" data-toggle="collapse"
@@ -112,7 +112,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="card">
                             <div class="card-header" id="...">
                                 <section class="mb-0 mt-0">
@@ -134,7 +134,7 @@
                                         <input type="number" min="1" name="expier_days" class="form-control" id="expier_days"
                                                value="{{$data['setting']['expier_days']}}">
                                     </div>
-                                    <div class="col-md-4">
+                                    {{-- <div class="col-md-4">
                                         <label for="plan_price"> &nbsp; </label>
                                         <div class="form-check pl-0">
                                             <div class="custom-control custom-checkbox checkbox-info">
@@ -144,7 +144,7 @@
                                                        for="show_buy">{{ __('messages.show_buy') }}</label>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="col-md-4">
                                         <label for="plan_price"> &nbsp; </label>
                                         <div class="form-check pl-0">

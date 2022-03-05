@@ -3,7 +3,7 @@
         //new
 
 
-        'reports' => "reports",
+        'reports' => "Ad reports",
         "report" => "Report",
         "ad_republished" => "Ad Has Republished",
         "All_republished" => "All Ads Have republished",
@@ -40,7 +40,7 @@
         'offer_image_en' => "Banner image display as home page (English)",
         'ad_settings' => "Ads settings",
         'cities' => "Provinces",
-        'areas' => "Regions",
+        'areas' => "Governorates",
         'area' => "Region",
         'map_location' => "Site Map",
         'city' => "Governorate",
@@ -354,7 +354,13 @@
         "color" => "Color",
         "comment_deleted" => "Comment deleted successfully",
         "comment_published" => "Comment published successfully",
-        "retweet" => "Retweet"
+        "retweet" => "Retweet",
+        "comment_reports" => "Comment reports",
+        "no_users_to_send" => "There are no users to send",
+        "send_to_personal" => "Send to personal accounts",
+        "send_to_commercial_accounts" => "Send to commercial accounts",
+        "account_type" => "Account type",
+        "send_to_all_users" => "Send to all users"
 
     ];
 ?>

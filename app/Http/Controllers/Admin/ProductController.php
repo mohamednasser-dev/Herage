@@ -18,6 +18,7 @@ use App\Plan_details;
 use App\SubCategory;
 use Carbon\Carbon;
 use App\Category;
+use App\CommentReport;
 use App\Product;
 use App\Setting;
 use App\Plan;
@@ -488,6 +489,13 @@ class ProductController extends AdminController
     public function commentsReports(Product_comment $comment) {
         $data = $comment;
         return view('admin.products.comment_reports',compact('data'));
+    }
+
+    // show all comments reporst
+    public function showAllCommentsReports() {
+        $data = CommentReport::orderBy('id', 'desc')->get();
+
+        return view('admin.products.all_comment_reports',compact('data'));
     }
 
     // reject comment

@@ -13,7 +13,7 @@ return [
     "unarchive_all" => "إلغاء أرشفة الكل",
     "unarchive" => "إلغاء الأرشفة",
     'reported' => "البلاغ",
-    'reports' => "البلاغات",
+    'reports' => "بلاغات الإعلانات",
     'expier_days' => "عدد أيام انتهاء الاعلان",
     'specialties' => "التخصصات",
     'reporter_name' => "اسم مقدم البلاغ",
@@ -116,8 +116,8 @@ return [
 
 
     'ad_settings' => "اعدادات الاعلانات",
-    'cities' => "المحافظات",
-    'areas' => "المناطق",
+    'cities' => "المناطق",
+    'areas' => "المحافظات",
     'area' => "المنطقة",
     'map_location' => "خريطة الموقع",
     'city' => "المحافظة",
@@ -348,6 +348,12 @@ return [
     "color" => "اللون",
     "comment_deleted" => "تم حذف التعليق",
     "comment_published" => "تم نشر التعليق",
-    "retweet" => "إعادة نشر"
+    "retweet" => "إعادة نشر",
+    "comment_reports" => "بلاغات التعليقات",
+    "no_users_to_send" => "لا يوجد مستخدمين لإرسال التبيهات",
+    "send_to_personal" => "إرسال إلى الحسابات الشخصية",
+    "send_to_commercial_accounts" => "إرسال إلى الحسابات المدفوعة",
+    "account_type" => "نوع الحسابات",
+    "send_to_all_users" => "إرسال إلى جميع المستخدمين"
 ];
 ?>

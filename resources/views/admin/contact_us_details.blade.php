@@ -35,7 +35,14 @@
             </div>
         </div>
     </div>  
-
+    <div class="row">
+        @foreach ($data['contact_us']->images as $image)
+            <div style="position : relative" class="col-md-2 product_image">
+                <img width="100%" src="{{image_cloudinary_url()}}{{ $image->image }}"  />
+            </div>
+        @endforeach
+        
+    </div>
 @endsection
 
 
