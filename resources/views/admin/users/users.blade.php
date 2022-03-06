@@ -25,6 +25,7 @@
                             <th>Id</th>
                             <th>{{ __('messages.user_name') }}</th>
                             <th>{{ __('messages.user_phone') }}</th>
+                            <th>{{ __('messages.account_type') }}</th>
                             <th class="text-center">{{ __('messages.block_active') }}</th>
                             {{-- <th class="text-center">{{ __('messages.send_balance') }}</th> --}}
                             <th class="text-center">{{ __('messages.details') }}</th>
@@ -41,6 +42,7 @@
                                 <td><?=$i;?></td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->phone }}</td>
+                                <td>{{ $user->Account_type->name }}</td>
                                 <td class="text-center">
                                     @if($user->active)
                                         <a href="/admin-panel/users/block/{{$user->id}}">

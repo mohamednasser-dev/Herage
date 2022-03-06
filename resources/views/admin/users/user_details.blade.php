@@ -31,7 +31,7 @@
                                 <td> {{ $data['user']['email'] }} </td>
                             </tr>
 
-                            <tr>
+                            {{--  <tr>
                                 <td class="label-table" > {{ __('messages.free_ads_count') }} </td>
 								
                                 <td>{{ $data['user']['free_ads_count'] }}</td>
@@ -39,7 +39,7 @@
                             <tr>
                                 <td class="label-table" > {{ __('messages.paid_ads_count') }} </td>
                                 <td> {{ $data['user']['paid_ads_count'] }} </td>
-                            </tr>
+                            </tr>  --}}
                            
                             <tr>
                                 <td class="label-table" > {{ __('messages.created_at') }} </td>

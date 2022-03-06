@@ -6,16 +6,20 @@ use JD\Cloudder\Facades\Cloudder;
 use Illuminate\Http\Request;
 use App\Helpers\APIHelpers;
 use App\WalletTransaction;
+use Illuminate\Support\Facades\Session;
 use App\UserNotification;
 use App\Notification;
 use App\Setting;
 use App\User;
+use App\Visitor;
 
 
 class UserController extends AdminController{
 
     // get all users
     public function show(Request $request){
+        $lang = \Lang::getLocale();
+        Session::put('api_lang', $lang);
         $data['users'] = User::orderBy('id','desc')->get();
         return view('admin.users.users' , ['data' => $data]);
     }
@@ -92,8 +96,12 @@ class UserController extends AdminController{
     // send notifications
     public function SendNotifications(Request $request){
         $user = User::find($request->id);
-        $fcm_token = $user->fcm_token;
-
+        $visitor = Visitor::where('user_id', $user->id)->where('fcm_token' ,'!=' , null)->latest('updated_at')->select('id', 'fcm_token')->first();
+        
+        if (!$visitor) {
+            return redirect('admin-panel/users/details/'.$request->id)->with('error', 'There is no fcm token for this user');
+        }
+        $fcm_token = $visitor->fcm_token;
         if(!$fcm_token){
             return redirect('admin-panel/users/details/'.$request->id)->with('error', 'Empty Fcm Token');
         }
@@ -124,6 +132,7 @@ class UserController extends AdminController{
 
         $notification = APIHelpers::send_notification($request->title , $request->body , $the_image , null , [$fcm_token]);
         $json_notification = json_decode($notification);
+        dd($json_notification);
         if($json_notification->success){
              return redirect('admin-panel/users/details/'.$request->id)->with('status', 'Sent');
         }else{
