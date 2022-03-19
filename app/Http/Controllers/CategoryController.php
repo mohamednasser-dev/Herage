@@ -52,7 +52,7 @@ class CategoryController extends Controller
         }
         
         $categories = $categories->select('id', 'title_' . $lang . ' as title', 'image')->orderBy('sort', 'asc')->get()->makeHidden(['ViewSubCategories', 'products'])
-        ->map(function ($row) use ($show, $model) {
+        ->map(function ($row) use ($show) {
             if ($show) {
                 $row->products_count = count($row->products);
             }
@@ -60,18 +60,18 @@ class CategoryController extends Controller
             $subCategories = $row->ViewSubCategories;
             
             if ($subCategories && count($subCategories) > 0) {
-                $hasProducts = false;
-                for ($n = 0; $n < count($subCategories); $n++) {
+                // $hasProducts = false;
+                // for ($n = 0; $n < count($subCategories); $n++) {
                     
-                    if ($model != '\App\SubFiveCategory') {
-                        if ($subCategories[$n]->products != null && count($subCategories[$n]->products) > 0) {
-                            $hasProducts = true;
-                        }
-                    }
-                }
-                if ($hasProducts) {
+                //     if ($model != '\App\SubFiveCategory') {
+                //         if ($subCategories[$n]->products != null && count($subCategories[$n]->products) > 0) {
+                //             $hasProducts = true;
+                //         }
+                //     }
+                // }
+                // if ($hasProducts) {
                     $row->next_level = true;
-                }
+                // }
             }
             $row->selected = false;
             return $row;

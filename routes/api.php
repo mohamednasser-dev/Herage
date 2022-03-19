@@ -115,6 +115,9 @@ use Illuminate\Http\Request;
 
     // get home data
     Route::get('/home-ads/{lang}/{v}' , 'HomeController@getHomeAds')->middleware('checkguest');
+    Route::get('/home-ads-ios/{lang}/{v}' , 'HomeController@getHomeAdsIos')->middleware('checkguest');
+    Route::get('/home-ads-android/{lang}/{v}' , 'HomeController@getHomeAdsAndroid')->middleware('checkguest');
+    
     Route::get('/home/city_filter/{area_id}/{lang}/{v}' , 'HomeController@city_filter')->middleware('checkguest');
     Route::get('/home/city_filter_without_paging/{area_id}/{lang}/{v}' , 'HomeController@city_filter_without_paging')->middleware('checkguest');
     

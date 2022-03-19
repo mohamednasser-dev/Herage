@@ -371,7 +371,7 @@ class UserController extends Controller
             return response()->json($response , 406);
         }
         $user_id = $user->id;
-        $visitor = Visitor::where('unique_id', $request->header('uniqueid'))->select('id')->first();
+        $visitor = Visitor::where('user_id', $user_id)->where('unique_id', $request->header('uniqueid'))->select('id')->first();
         $notifications_ids = UserNotification::where('user_id', $user_id)->where('visitor_id', $visitor->id)->orderBy('id', 'desc')->select('notification_id')->get();
         $notifications = [];
         for ($i = 0; $i < count($notifications_ids); $i++) {

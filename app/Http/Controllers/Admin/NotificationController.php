@@ -91,7 +91,15 @@ class NotificationController extends AdminController{
     public function resend(Request $request){
         $notification_id = $request->id;
         $notification = Notification::find($notification_id);
-
+        $users = Visitor::select('id','fcm_token', 'user_id')->where('fcm_token' ,'!=' , null)->get();
+        for($i =0; $i < count($users); $i++){
+            $fcm_tokens[$i] = $users[$i]['fcm_token'];
+            $user_notification = new UserNotification();
+            $user_notification->visitor_id = $users[$i]['id'];
+            $user_notification->user_id = $users[$i]['user_id'];
+            $user_notification->notification_id = $notification->id;
+            $user_notification->save();            
+        }
         $array_values = Visitor::orderBy('id', 'desc');
         if ($notification->account_type != 'all') {
             $array_values = $array_values->whereHas('user', function($q) use ($notification) {
