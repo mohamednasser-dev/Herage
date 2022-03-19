@@ -132,7 +132,7 @@ class UserController extends AdminController{
 
         $notification = APIHelpers::send_notification($request->title , $request->body , $the_image , null , [$fcm_token]);
         $json_notification = json_decode($notification);
-        dd($json_notification);
+        
         if($json_notification->success){
              return redirect('admin-panel/users/details/'.$request->id)->with('status', 'Sent');
         }else{

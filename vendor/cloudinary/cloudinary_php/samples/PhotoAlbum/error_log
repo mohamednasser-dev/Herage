@@ -1,0 +1,4 @@
+[13-Mar-2022 20:01:23 UTC] PHP Fatal error:  Uncaught Error: Class 'Cloudinary' not found in /home/alelaan/public_html/vendor/cloudinary/cloudinary_php/samples/PhotoAlbum/settings.php.sample:2
+Stack trace:
+#0 {main}
+  thrown in /home/alelaan/public_html/vendor/cloudinary/cloudinary_php/samples/PhotoAlbum/settings.php.sample on line 2

@@ -353,7 +353,7 @@ return [
     "no_users_to_send" => "لا يوجد مستخدمين لإرسال التبيهات",
     "send_to_personal" => "إرسال إلى الحسابات الشخصية",
     "send_to_commercial_accounts" => "إرسال إلى الحسابات المدفوعة",
-    "account_type" => "نوع الحساب",
+    "account_type" => "نوع الحسابات",
     "send_to_all_users" => "إرسال إلى جميع المستخدمين"
 ];
 ?>

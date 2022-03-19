@@ -53,7 +53,7 @@ class HomeController extends Controller
         }
 
         $categories = $categories->select('id', 'title_' . $lang . ' as title', 'image')->orderBy('sort', 'asc')->get()->makeHidden(['ViewSubCategories', 'products'])
-        ->map(function ($row) use ($show, $model) {
+        ->map(function ($row) use ($show) {
             if ($show) {
                 $row->products_count = count($row->products);
             }

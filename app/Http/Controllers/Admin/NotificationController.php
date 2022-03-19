@@ -108,11 +108,12 @@ class NotificationController extends AdminController{
                 });
             });
         }
+        
         $array_values = $array_values->pluck('fcm_token')->toArray();
         
 		
         $nots = APIHelpers::send_notification($notification->title , $notification->body , $notification->image , (object)[] , $array_values);
-        //dd($nots);
+        
 		session()->flash('success', trans('messages.sent_s'));
         return redirect()->back();
     }
